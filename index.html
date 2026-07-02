@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>4R Farm - Pencatatan Peternakan + PO</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 16px; padding-bottom: 80px; }
+        .header { background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); color: white; padding: 20px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 24px; margin-bottom: 4px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .tabs { display: flex; flex-wrap: wrap; background: white; border-radius: 16px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .tab { flex: 1; text-align: center; padding: 12px 6px; font-size: 12px; font-weight: 600; background: white; border: none; cursor: pointer; color: #666; }
+        .tab.active { background: #2E7D32; color: white; }
+        .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 16px; border-left: 4px solid #2E7D32; padding-left: 12px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 14px; font-weight: 600; color: #555; margin-bottom: 6px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #2E7D32; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        button { background: #2E7D32; color: white; border: none; padding: 14px 20px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+        button:hover { background: #1B5E20; }
+        button.secondary { background: #FF9800; }
+        button.danger { background: #f44336; }
+        button.small { padding: 8px 12px; font-size: 14px; width: auto; }
+        button.success { background: #2196F3; }
+        .radio-group { display: flex; gap: 20px; margin-bottom: 20px; padding: 12px; background: #f8f9fa; border-radius: 12px; flex-wrap: wrap; }
+        .radio-group label { display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; margin: 0; font-size: 14px; }
+        .radio-group input { width: 18px; height: 18px; margin: 0; }
+        .satuan-group { display: flex; gap: 12px; margin-bottom: 16px; }
+        .satuan-btn { flex: 1; background: #f0f0f0; color: #666; border: none; padding: 12px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .satuan-btn.active { background: #2E7D32; color: white; }
+        .jenis-group { display: flex; gap: 12px; margin-bottom: 16px; }
+        .jenis-btn { flex: 1; background: #f0f0f0; color: #666; border: none; padding: 12px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .jenis-btn.active { background: #2E7D32; color: white; }
+        .summary-list { display: flex; flex-direction: column; gap: 12px; }
+        .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8f9fa; border-radius: 12px; }
+        .summary-label { font-size: 14px; color: #666; font-weight: 500; }
+        .summary-value { font-size: 18px; font-weight: 700; color: #2E7D32; }
+        .summary-value.negative { color: #f44336; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stats-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: #f8f9fa; padding: 14px; border-radius: 16px; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: 800; color: #2E7D32; }
+        .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
+        .list-item { background: #f8f9fa; padding: 14px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #2E7D32; }
+        .list-item-title { font-weight: 700; margin-bottom: 6px; }
+        .list-item-detail { font-size: 13px; color: #666; }
+        .po-item { background: #f8f9fa; padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; border-left: 4px solid #FF9800; }
+        .po-item.po-item-flex { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+        .po-header-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .po-header-row .nama { font-weight: 600; font-size: 14px; }
+        button.small.icon-only { padding: 6px 10px; font-size: 13px; }
+        button.small.compact { padding: 6px 10px; font-size: 12px; }
+        .po-meta-row { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12px; color: #555; }
+        .po-info { flex: 1; }
+        .po-info .nama { font-weight: 700; font-size: 16px; }
+        .po-info .detail { font-size: 13px; color: #666; margin-top: 4px; }
+        .po-status { font-size: 12px; margin-top: 4px; }
+        .status-lunas { color: #2E7D32; background: #e8f5e9; display: inline-block; padding: 2px 8px; border-radius: 20px; }
+        .status-belum { color: #f44336; background: #ffebee; display: inline-block; padding: 2px 8px; border-radius: 20px; }
+        .stok-cukup { color: #2E7D32; font-size: 12px; }
+        .stok-kurang { color: #f44336; font-size: 12px; }
+        .po-actions { display: flex; gap: 8px; }
+        .po-actions button { padding: 8px 12px; font-size: 12px; width: auto; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #e8f5e9; color: #2E7D32; }
+        .badge-warning { background: #fff3e0; color: #FF9800; }
+        .badge-danger { background: #ffebee; color: #f44336; }
+        .chart-container { margin: 16px 0; }
+        .chart-bar { display: flex; align-items: center; margin-bottom: 8px; }
+        .chart-label { width: 80px; font-size: 12px; }
+        .chart-bar-fill { flex: 1; height: 30px; background: #FF9800; border-radius: 8px; transition: width 0.3s; min-width: 4px; }
+        .hidden { display: none; }
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 16px; font-size: 14px; }
+        .alert-warning { background: #fff3e0; color: #e65100; border-left: 4px solid #FF9800; }
+        .alert-success { background: #e8f5e9; color: #2E7D32; border-left: 4px solid #2E7D32; }
+        .export-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+        .export-btn { background: #4CAF50; padding: 10px; font-size: 14px; }
+        .import-preview { background: #f8f9fa; border-radius: 12px; padding: 16px; margin: 16px 0; }
+        .info-box { font-size: 12px; color: #666; margin-top: 8px; padding: 8px; background: #f8f9fa; border-radius: 8px; }
+        .riwayat-list { max-height: 400px; overflow-y: auto; }
+        .riwayat-item { background: #f8f9fa; padding: 12px; border-radius: 12px; margin-bottom: 8px; border-left: 4px solid; }
+        .riwayat-item.produksi { border-left-color: #2E7D32; }
+        .riwayat-item.jual { border-left-color: #2196F3; }
+        .riwayat-item.gift { border-left-color: #1976D2; }
+        .riwayat-item.kas { border-left-color: #FF9800; }
+        .riwayat-item.raw_pengeluaran { border-left-color: #f44336; }
+        .riwayat-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+        .riwayat-detail { color: #666; font-size: 12px; }
+        .riwayat-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+        .delete-entry { background: none; border: none; color: #f44336; font-size: 12px; padding: 4px 8px; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 20px; padding: 24px; width: 90%; max-width: 350px; }
+        .modal-content h3 { margin-bottom: 16px; }
+        .version-info { text-align: center; margin-top: 8px; font-size: 10px; color: #999; }
+        .email-alert-box { background: #ffebee; color: #c62828; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-bottom: 16px; text-align: center; border-left: 4px solid #f44336; }
+        @media (max-width: 600px) { .stats-grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🥚 4R Farm</h1>
+        <p>Pencatatan Peternakan Telur | Horn & Kampung</p>
+        <div class="version-info" style="color:rgba(255,255,255,0.7); margin-top:4px;">Versi 2.2.0 | Sync Online</div>
+    </div>
+
+    <!-- Alert jika email belum disetel -->
+    <div id="email-warning-banner" class="email-alert-box hidden">
+        ⚠️ Email akses cloud belum diisi di HP ini! Silakan isi di tab "⚙️ Pengaturan" paling kanan agar sinkronisasi berfungsi.
+    </div>
+
+    <div id="sync-status" style="display:flex; align-items:center; gap:8px; background:white; border-radius:16px; padding:10px 16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-size:13px;">
+        <span id="sync-icon">🔄</span>
+        <span id="sync-text" style="flex:1; color:#666;">Menghubungkan...</span>
+        <button class="small" style="width:auto; padding:6px 12px; font-size:12px;" onclick="manualSync()">Sync Sekarang</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('dashboard', this)">📊 Dashboard</button>
+        <button class="tab" onclick="showTab('produksi', this)">🥚 Produksi</button>
+        <button class="tab" onclick="showTab('pemasukan', this)">💰 Pemasukan</button>
+        <button class="tab" onclick="showTab('po', this)">📋 PO</button>
+        <button class="tab" onclick="showTab('pelanggan', this)">👥 Pelanggan</button>
+        <button class="tab" onclick="showTab('pengeluaran', this)">💸 Pengeluaran</button>
+        <button class="tab" onclick="showTab('laporan', this)">📈 Laporan</button>
+        <button class="tab" onclick="showTab('produktivitas', this)">📊 Produktivitas</button>
+        <button class="tab" onclick="showTab('export', this)">📎 Export</button>
+        <button class="tab" onclick="showTab('pengaturan', this)">⚙️ Pengaturan</button>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div id="tab-dashboard" class="tab-content">
+        <div class="card"><div class="card-title">📊 Ringkasan Bulan Ini</div>
+            <div class="summary-list">
+                <div class="summary-item"><span class="summary-label">💰 Pemasukan</span><span class="summary-value" id="dash-pemasukan">Rp 0</span></div>
+                <div class="summary-item"><span class="summary-label">💸 Pengeluaran</span><span class="summary-value" id="dash-pengeluaran">Rp 0</span></div>
+                <div class="summary-item"><span class="summary-label">📈 Laba/Rugi</span><span class="summary-value" id="dash-laba">Rp 0</span></div>
+                <div class="summary-item"><span class="summary-label">🥚 Rata-rata HDP</span><span class="summary-value" id="dash-hdp">0%</span></div>
+            </div>
+        </div>
+        <div class="card"><div class="card-title">📦 Stok Telur Layak Jual</div>
+            <div class="stats-grid">
+                <div class="stat-card" style="background:#e8f5e9;"><div class="stat-value" id="stok-horn">0</div><div class="stat-label">Stok Horn (butir)</div></div>
+                <div class="stat-card" style="background:#e8f5e9;"><div class="stat-value" id="stok-elba">0</div><div class="stat-label">Stok Elba (butir)</div></div>
+            </div>
+        </div>
+        <div id="po-notif-banner"></div>
+        <div class="card"><div class="card-title">📋 Antrian PO (5 teratas)</div><div id="po-queue-dashboard" class="riwayat-list"><div class="info-box" style="text-align:center;">Belum ada PO</div></div></div>
+        <div class="card"><div class="card-title">🐔 Populasi Saat Ini</div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value" id="pop-horn">0</div><div class="stat-label">Ayam Horn</div></div>
+                <div class="stat-card"><div class="stat-value" id="pop-elba">0</div><div class="stat-label">Ayam Elba</div></div>
+            </div>
+        </div>
+        <div class="card"><div class="card-title">📉 Evaluasi Telur Tidak Layak</div><div id="evaluasi-container"></div></div>
+        <div class="card"><div class="card-title">📈 Tren Produksi 7 Hari Terakhir</div><div id="trend-chart" class="chart-container"></div></div>
+        <div class="card"><div class="card-title">🏆 Top 5 Pembeli Terbanyak</div><div id="top-pembeli"></div></div>
+        <div class="card"><div class="card-title">🎁 Konsumsi & Gift</div><div id="gift-summary"></div></div>
+    </div>
+
+    <!-- Produksi Tab -->
+    <div id="tab-produksi" class="tab-content hidden">
+        <div class="card"><div class="card-title">🥚 Input Produksi</div>
+            <div class="row-3" style="margin-bottom:16px;">
+                <div><label>Tanggal</label><input type="date" id="produksi-tanggal"></div>
+                <div><label>Jam</label><input type="time" id="produksi-jam" step="60"></div>
+                <div><label>Catatan</label><input type="text" id="produksi-catatan" placeholder="pagi/siang/sore"></div>
+            </div>
+            <div class="form-group"><label>🐔 Telur Horn</label>
+                <input type="number" id="horn-total" placeholder="Total produksi (butir)" value="0">
+                <div class="row-2" style="margin-top:8px;">
+                    <input type="number" id="horn-tidak-layak" placeholder="Tidak layak jual" value="0">
+                    <div style="background:#f0f0f0; border-radius:12px; padding:12px; text-align:center;">Layak jual: <strong id="horn-layak">0</strong></div>
+                </div>
+            </div>
+            <div class="form-group"><label>🐔 Telur Elba/Kampung</label>
+                <input type="number" id="elba-total" placeholder="Total produksi (butir)" value="0">
+                <div class="row-2" style="margin-top:8px;">
+                    <input type="number" id="elba-tidak-layak" placeholder="Tidak layak jual" value="0">
+                    <div style="background:#f0f0f0; border-radius:12px; padding:12px; text-align:center;">Layak jual: <strong id="elba-layak">0</strong></div>
+                </div>
+            </div>
+            <button onclick="simpanProduksi()">💾 Simpan Produksi</button>
+        </div>
+        <div class="card"><div class="card-title">📋 Riwayat Produksi (15 terakhir)</div><div id="riwayat-produksi" class="riwayat-list"><div class="info-box" style="text-align:center;">Belum ada data</div></div></div>
+    </div>
+
+    <!-- Pemasukan Tab -->
+    <div id="tab-pemasukan" class="tab-content hidden">
+        <div class="card"><div class="card-title">💰 Input Pemasukan / Gift</div>
+            <div class="form-group"><label>Tanggal</label><input type="date" id="pemasukan-tanggal"></div>
+            <div class="radio-group">
+                <label><input type="radio" name="transaksi-jenis" value="jual" checked onchange="toggleTransaksiJenis()"> 💰 Penjualan</label>
+                <label><input type="radio" name="transaksi-jenis" value="gift" onchange="toggleTransaksiJenis()"> 🎁 Konsumsi/Gift</label>
+                <label><input type="radio" name="transaksi-jenis" value="kas" onchange="toggleTransaksiJenis()"> 📝 Mode Kas</label>
+            </div>
+            <div id="form-jual">
+                <div class="form-group">
+                    <label>Jenis Telur</label>
+                    <div class="jenis-group">
+                        <button type="button" id="jual-btn-horn" class="jenis-btn active" onclick="setJualJenis('horn')">🐔 HORN (Rp <span id="harga-horn-display">0</span>)</button>
+                        <button type="button" id="jual-btn-elba" class="jenis-btn" onclick="setJualJenis('elba')">🐔 ELBA (Rp <span id="harga-elba-display">0</span>)</button>
+                    </div>
+                </div>
+                <div class="form-group"><label>Satuan</label><div class="satuan-group"><button type="button" id="btn-butir" class="satuan-btn active" onclick="setSatuan('butir')">BUTIR</button><button type="button" id="btn-pack" class="satuan-btn" onclick="setSatuan('pack')">PACK (1 pack = 10 butir)</button></div></div>
+                <div class="form-group"><label id="label-jumlah">Jumlah (butir)</label><input type="number" id="jual-jumlah" placeholder="Jumlah"></div>
+                <div class="form-group"><label id="label-harga">Harga per butir (Rp)</label><input type="number" id="jual-harga" placeholder="Harga"></div>
+                <div class="form-group"><label>Nama Pembeli <span style="color:#f44336;">*</span></label><input type="text" id="jual-pembeli" placeholder="Nama pembeli"></div>
+                <div class="form-group"><label>No. WhatsApp (opsional)</label><input type="tel" id="jual-wa" placeholder="Contoh: 081234567890"></div>
+                <div id="stok-warning-jual" class="alert alert-warning hidden">⚠️ Stok tidak mencukupi!</div>
+            </div>
+            <div id="form-gift" class="hidden">
+                <div class="form-group">
+                    <label>Jenis Telur</label>
+                    <div class="jenis-group">
+                        <button type="button" id="gift-btn-horn" class="jenis-btn active" onclick="setGiftJenis('horn')">🐔 HORN</button>
+                        <button type="button" id="gift-btn-elba" class="jenis-btn" onclick="setGiftJenis('elba')">🐔 ELBA</button>
+                    </div>
+                </div>
+                <div class="form-group"><label>Jumlah (butir)</label><input type="number" id="gift-jumlah" placeholder="Jumlah"></div>
+                <div class="form-group"><label>Diberikan kepada</label><input type="text" id="gift-penerima" placeholder="pegawai, ortu, sendiri"></div>
+                <div id="stok-warning-gift" class="alert alert-warning hidden">⚠️ Stok tidak mencukupi!</div>
+            </div>
+            <div id="form-kas" class="hidden">
+                <div class="form-group"><label>Nominal (Rp)</label><input type="number" id="kas-nominal" placeholder="Jumlah uang"></div>
+                <div class="form-group"><label>Nama Pembeli (opsional)</label><input type="text" id="kas-pembeli" placeholder="Nama pembeli"></div>
+            </div>
+            <button onclick="simpanPemasukan()" style="margin-top:16px;">💾 Simpan</button>
+        </div>
+        <div class="card"><div class="card-title">📋 Riwayat Pemasukan (15 terakhir)</div><div id="riwayat-pemasukan" class="riwayat-list"><div class="info-box" style="text-align:center;">Belum ada data</div></div></div>
+    </div>
+
+    <!-- PO Tab -->
+    <div id="tab-po" class="tab-content hidden">
+        <div class="card"><div class="card-title">📋 Input Pre-Order (PO)</div>
+            <div class="form-group"><label>Nama Pembeli</label><input type="text" id="po-nama" placeholder="Nama pembeli"></div>
+            <div class="form-group"><label>No. WhatsApp (opsional)</label><input type="tel" id="po-wa" placeholder="Contoh: 081234567890"></div>
+            <div class="form-group">
+                <label>Jenis Telur</label>
+                <div class="jenis-group">
+                    <button type="button" id="po-btn-horn" class="jenis-btn active" onclick="setPoJenis('horn')">🐔 HORN</button>
+                    <button type="button" id="po-btn-elba" class="jenis-btn" onclick="setPoJenis('elba')">🐔 ELBA</button>
+                </div>
+            </div>
+            <div class="form-group"><label>Satuan</label><div class="satuan-group"><button type="button" id="po-btn-butir" class="satuan-btn active" onclick="setPoSatuan('butir')">BUTIR</button><button type="button" id="po-btn-pack" class="satuan-btn" onclick="setPoSatuan('pack')">PACK (1 pack = 10 butir)</button></div></div>
+            <div class="form-group"><label id="po-label-jumlah">Jumlah (butir)</label><input type="number" id="po-jumlah" placeholder="Jumlah"></div>
+            <div class="checkbox-group" style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                <input type="checkbox" id="po-lunas" style="width:20px; height:20px;">
+                <label for="po-lunas" style="margin:0;">✅ Sudah bayar (lunas)</label>
+            </div>
+            <button onclick="simpanPO()">💾 Simpan PO</button>
+        </div>
+        <div class="card"><div class="card-title">📋 Daftar PO Aktif (Urutan FIFO)</div><div id="po-list" class="riwayat-list"><div class="info-box" style="text-align:center;">Belum ada PO aktif</div></div></div>
+        <div class="card"><div class="card-title">📋 Riwayat PO Selesai</div><div id="po-history" class="riwayat-list"><div class="info-box" style="text-align:center;">Belum ada PO selesai</div></div></div>
+    </div>
+
+    <!-- Pelanggan Tab -->
+    <div id="tab-pelanggan" class="tab-content hidden">
+        <div class="card"><div class="card-title">👥 Pelanggan Perlu Follow-Up</div>
+            <div class="info-box" style="margin-bottom:12px; font-size:12px; color:#666;">Pelanggan yang biasanya beli rutin, tapi sudah lewat dari siklus normal mereka. Cocok untuk di-chat duluan.</div>
+            <div id="pelanggan-followup" class="riwayat-list"><div class="info-box" style="text-align:center;">Belum ada data cukup</div></div>
+        </div>
+        <div class="card"><div class="card-title">👥 Semua Pelanggan</div>
+            <div class="form-group"><label>Urutkan</label><select id="pelanggan-sort" onchange="updatePelangganList()"><option value="terlambat">Paling Perlu Follow-Up</option><option value="total">Total Belanja Terbesar</option><option value="terakhir">Terakhir Beli</option><option value="frekuensi">Paling Sering Beli</option></select></div>
+            <div id="pelanggan-list" class="riwayat-list"><div class="info-box" style="text-align:center;">Belum ada data pelanggan</div></div>
+        </div>
+    </div>
+
+    <!-- Pengeluaran Tab -->
+    <div id="tab-pengeluaran" class="tab-content hidden">
+        <div class="card"><div class="card-title">💸 Input Pengeluaran</div>
+            <div class="form-group"><label>Tanggal</label><input type="date" id="pengeluaran-tanggal"></div>
+            <div class="form-group"><label>Kategori</label><select id="pengeluaran-kategori"><option value="pakan">🍚 Pakan</option><option value="obat">💊 Obat/Vaksin</option><option value="perawatan">🔨 Perawatan Kandang</option><option value="lainnya">📦 Lainnya</option></select></div>
+            <div class="form-group"><label>Nominal (Rp)</label><input type="number" id="pengeluaran-nominal" placeholder="Jumlah"></div>
+            <div class="form-group"><label>Keterangan</label><input type="text" id="pengeluaran-keterangan" placeholder="Contoh: beli pakan 2 sak"></div>
+            <button onclick="simpanPengeluaran()">💾 Simpan Pengeluaran</button>
+        </div>
+        <div class="card"><div class="card-title">📋 Riwayat Pengeluaran (15 terakhir)</div><div id="riwayat-pengeluaran" class="riwayat-list"><div class="info-box" style="text-align:center;">Belum ada data pengeluaran</div></div></div>
+    </div>
+
+    <!-- Laporan Tab -->
+    <div id="tab-laporan" class="tab-content hidden">
+        <div class="card"><div class="card-title">📈 Laporan Keuangan</div>
+            <div class="form-group"><label>Periode</label><select id="periode-laporan" onchange="loadLaporan()"><option value="minggu">Minggu Ini</option><option value="bulan">Bulan Ini</option><option value="all">Semua Waktu</option></select></div>
+            <div id="laporan-container"></div>
+        </div>
+    </div>
+
+    <!-- Produktivitas Tab -->
+    <div id="tab-produktivitas" class="tab-content hidden">
+        <div class="card"><div class="card-title">📊 Produktivitas Telur</div>
+            <div class="form-group"><label>Periode</label><select id="periode-produktivitas" onchange="loadProduktivitas()"><option value="minggu">Minggu Ini</option><option value="bulan">Bulan Ini</option><option value="all">Semua Waktu</option></select></div>
+            <div id="produktivitas-container"></div>
+        </div>
+    </div>
+
+    <!-- Export Tab -->
+    <div id="tab-export" class="tab-content hidden">
+        <div class="card"><div class="card-title">📎 Export Data</div>
+            <div class="export-group"><button class="export-btn" onclick="exportProduksi()">🥚 Export Produksi</button><button class="export-btn" onclick="exportPemasukan()">💰 Export Pemasukan</button><button class="export-btn" onclick="exportPengeluaran()">💸 Export Pengeluaran</button></div>
+            <div class="export-group"><button class="export-btn" onclick="exportSemua()">📊 Export Semua</button><button class="export-btn" onclick="exportLaporanKeuangan()">📈 Laporan Keuangan</button><button class="export-btn" onclick="exportLaporanPembeli()">👥 Data Pembeli</button></div>
+        </div>
+        <div class="card"><div class="card-title">📦 Backup JSON</div><button class="secondary" onclick="exportBackupJSON()">💾 Backup JSON</button></div>
+        <div class="card"><div class="card-title">📋 Ringkasan Data</div><div class="stats-grid-4"><div class="stat-card"><div class="stat-value" id="stat-produksi">0</div><div class="stat-label">Entry Produksi</div></div><div class="stat-card"><div class="stat-value" id="stat-pemasukan">0</div><div class="stat-label">Transaksi</div></div><div class="stat-card"><div class="stat-value" id="stat-pengeluaran">0</div><div class="stat-label">Pengeluaran</div></div><div class="stat-card"><div class="stat-value" id="stat-pembeli">0</div><div class="stat-label">Pembeli</div></div></div></div>
+    </div>
+
+    <!-- Pengaturan Tab -->
+    <div id="tab-pengaturan" class="tab-content hidden">
+        <!-- FORM INTEGRASI INPUT EMAIL CLOUD -->
+        <div class="card" style="border: 2px solid #2E7D32; background: #fafdfa;">
+            <div class="card-title">🔐 Konfigurasi Akun Hak Akses Cloud</div>
+            <div class="form-group">
+                <label>Alamat Email Google Perangkat Ini</label>
+                <input type="text" id="app-user-email-input" placeholder="contoh: ratna.fajri22@gmail.com">
+                <div class="info-box" style="background:none; padding:4px 0;">💡 Masukkan email Gmail Anda agar sinkronisasi cloud ke Google Sheets 4R Farm aktif.</div>
+            </div>
+            <button onclick="simpanEmailManual()">💾 Simpan Email Akun HP Ini</button>
+        </div>
+
+        <div class="card"><div class="card-title">⚙️ Populasi</div><div class="row-2"><div><label>Horn (ekor)</label><input type="number" id="setting-horn-pop"></div><div><label>Elba (ekor)</label><input type="number" id="setting-elba-pop"></div></div><button onclick="simpanPopulasi()">💾 Simpan</button></div>
+        <div class="card"><div class="card-title">💰 Harga Jual</div><div class="row-2"><div><label>Horn (Rp/butir)</label><input type="number" id="setting-horn-price"></div><div><label>Elba (Rp/butir)</label><input type="number" id="setting-elba-price"></div></div><button onclick="simpanHarga()">💾 Simpan</button></div>
+        <div class="card"><div class="card-title">📦 Stok Awal</div><div class="row-2"><div><label>Stok Horn (butir)</label><input type="number" id="stok-awal-horn" value="0"></div><div><label>Stok Elba (butir)</label><input type="number" id="stok-awal-elba" value="0"></div></div><button onclick="setStokAwal()">Set Stok Awal</button><div class="info-box">💡 Stok awal diisi sekali</div></div>
+        <div class="card"><div class="card-title">📁 Backup & Restore</div>
+            <input type="file" id="file-import" accept=".json" style="margin-bottom:16px; padding:10px; border:1px solid #ddd; border-radius:12px;">
+            <button onclick="document.getElementById('file-import').click()" style="background:#2196F3; margin-bottom:16px;">📂 Pilih File Backup</button>
+            <div id="import-preview" class="import-preview hidden"><div id="preview-content"></div><div class="radio-group"><label><input type="radio" name="import-mode" value="tambah" checked> ➕ Tambah</label><label><input type="radio" name="import-mode" value="ganti"> 🔄 Ganti Semua</label></div><button onclick="prosesImport()">📥 Import</button></div>
+        </div>
+        <div class="card"><div class="card-title">⚠️ Hapus Semua Data</div><button class="danger" onclick="hapusSemuaData()">🗑️ Hapus Semua</button></div>
+    </div>
+
+    <!-- Modal Input Harga untuk PO Belum Bayar -->
+    <div id="modal-harga" class="modal"><div class="modal-content"><h3>Input Harga Penjualan</h3><div class="form-group"><label>Harga per butir (Rp)</label><input type="number" id="modal-harga-input" placeholder="Harga jual"></div><div class="row-2" style="margin-top:16px;"><button onclick="closeModalHarga()" style="background:#9e9e9e;">Batal</button><button onclick="konfirmasiRealisasiHarga()" style="background:#2196F3;">Konfirmasi</button></div></div></div>
+
+    <script>
+        // ==================== VERSION INFO ====================
+        const APP_VERSION = '2.1.1';
+        const APP_DATE = '2026-04-04';
+        
+        // ==================== STORAGE KEYS ====================
+        const STORAGE_KEYS = {
+            PRODUKSI: '4rfarm_produksi_v2',
+            PEMASUKAN: '4rfarm_pemasukan',
+            PENGELUARAN: '4rfarm_pengeluaran',
+            POPULASI: '4rfarm_populasi',
+            HARGA: '4rfarm_harga',
+            STOK_AWAL: '4rfarm_stok_awal',
+            PO: '4rfarm_po'
+        };
+
+        // ==================== DATA ====================
+        let dataProduksi = [], dataPemasukan = [], dataPengeluaran = [], dataPO = [];
+        let populasi = { horn: 6, elba: 32 }, harga = { horn: 2000, elba: 2500 }, stokAwal = { horn: 0, elba: 0 };
+        let satuanAktif = 'butir', poSatuanAktif = 'butir';
+        let fileDataImport = null;
+        let pendingPOId = null;
+        
+        let jualJenisAktif = 'horn';
+        let giftJenisAktif = 'horn';
+        let poJenisAktif = 'horn';
+
+        // ==================== SYNC ONLINE (Google Apps Script) ====================
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyW1969nYIFUYxaFeyT2un9WTf6Xtb4K8q2BvhT-P5PARAZ4Q33SHcgs4o8zABXIWlE/exec';
+        let syncTimer = null;
+        let isSyncing = false;
+        let isOnline = navigator.onLine;
+        let hasPendingChanges = false;
+        let pendingChangeVersion = 0;
+
+        function getSavedUserEmail() {
+          let email = localStorage.getItem('user_email');
+          if (!email) {
+             document.getElementById('email-warning-banner').classList.remove('hidden');
+             return '';
+          }
+          document.getElementById('email-warning-banner').classList.add('hidden');
+          return email.trim().toLowerCase();
+        }
+
+        function simpanEmailManual() {
+          let emailVal = document.getElementById('app-user-email-input').value;
+          if(!emailVal || emailVal.indexOf('@') === -1) {
+             alert("Masukkan alamat email Gmail yang valid!");
+             return;
+          }
+          localStorage.setItem('user_email', emailVal.trim().toLowerCase());
+          alert("Email akses cloud berhasil disimpan di perangkat ini! Menghubungkan ulang...");
+          document.getElementById('email-warning-banner').classList.add('hidden');
+          pullFromServer(false);
+        }
+
+        function setSyncStatus(icon, text, color) {
+            let iconEl = document.getElementById('sync-icon'), textEl = document.getElementById('sync-text');
+            if (iconEl) iconEl.innerText = icon;
+            if (textEl) { textEl.innerText = text; textEl.style.color = color || '#666'; }
+        }
+
+        function setText(id, value) {
+            let el = document.getElementById(id);
+            if (el) el.innerText = value;
+        }
+
+        function isApiConfigured() {
+            return API_URL && API_URL.indexOf('PASTE_URL') === -1;
+        }
+
+        function pullFromServer(silent) {
+            return new Promise((resolve) => {
+                const emailAktif = getSavedUserEmail();
+                if (!emailAktif) { setSyncStatus('⚠️', 'Email akun belum di-setting', '#f44336'); resolve(); return; }
+                if (!isApiConfigured()) { setSyncStatus('⚠️', 'Belum di-setting (lihat panduan)', '#f44336'); resolve(); return; }
+                if (!navigator.onLine) { setSyncStatus('📴', 'Offline - pakai data lokal', '#FF9800'); resolve(); return; }
+                if (hasPendingChanges) { resolve(); return; }
+                if (!silent) setSyncStatus('🔄', 'Mengambil data terbaru...');
+                
+                let cbName = 'jsonp_cb_' + Date.now();
+                let script = document.createElement('script');
+                let timeout = setTimeout(() => {
+                    cleanup();
+                    setSyncStatus('⚠️', 'Gagal ambil data: timeout/koneksi', '#f44336');
+                    resolve();
+                }, 15000);
+                
+                function cleanup() {
+                    clearTimeout(timeout);
+                    delete window[cbName];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                }
+                
+                window[cbName] = function(json) {
+                    cleanup();
+                    try {
+                        if (hasPendingChanges) { resolve(); return; }
+                        if (!json.ok) throw new Error(json.error || 'Gagal mengambil data');
+                        let d = json.data;
+                        dataProduksi = d.produksi || [];
+                        dataPemasukan = d.pemasukan || [];
+                        dataPengeluaran = d.pengeluaran || [];
+                        dataPO = d.po || [];
+                        populasi = d.populasi || populasi;
+                        harga = d.harga || harga;
+                        stokAwal = d.stokAwal || stokAwal;
+                        persistLocalOnly();
+                        updateDashboard(); updatePengaturanForm(); updateHargaDisplay(); updateExportStats();
+                        updateRiwayatProduksi(); updateRiwayatPemasukan(); updatePelangganList(); updatePOList(); updateRiwayatPengeluaran();
+                        setSyncStatus('✅', 'Data terbaru dari server', '#2E7D32');
+                    } catch (err) {
+                        setSyncStatus('⚠️', 'Gagal ambil data: ' + err.message, '#f44336');
+                    }
+                    resolve();
+                };
+                
+                script.src = API_URL + '?callback=' + cbName + '&userEmail=' + encodeURIComponent(emailAktif) + '&_=' + Date.now();
+                script.onerror = () => { cleanup(); setSyncStatus('⚠️', 'Gagal ambil data: koneksi error', '#f44336'); resolve(); };
+                document.body.appendChild(script);
+            });
+        }
+
+        function queueSync() {
+            persistLocalOnly();
+            hasPendingChanges = true;
+            pendingChangeVersion++;
+            if (!isApiConfigured()) { setSyncStatus('⚠️', 'Belum di-setting (lihat panduan)', '#f44336'); return; }
+            setSyncStatus('💾', 'Menyimpan perubahan...', '#FF9800');
+            if (syncTimer) clearTimeout(syncTimer);
+            syncTimer = setTimeout(pushToServer, 1500);
+        }
+
+        function pushToServer() {
+            return new Promise((resolve) => {
+                const emailAktif = getSavedUserEmail();
+                if (!emailAktif) { setSyncStatus('⚠️', 'Email akun belum di-setting', '#f44336'); resolve(); return; }
+                if (!isApiConfigured() || isSyncing) { resolve(); return; }
+                if (!navigator.onLine) { setSyncStatus('📴', 'Offline - akan sync saat online lagi', '#FF9800'); resolve(); return; }
+                isSyncing = true;
+                let versionAtStart = pendingChangeVersion;
+                setSyncStatus('🔄', 'Sinkronisasi ke server...');
+                let payload = { produksi: dataProduksi, pemasukan: dataPemasukan, pengeluaran: dataPengeluaran, po: dataPO, populasi: populasi, harga: harga, stokAwal: stokAwal };
+
+                let iframeName = 'sync_frame_' + Date.now();
+                let iframe = document.createElement('iframe');
+                iframe.name = iframeName;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = API_URL + '?userEmail=' + encodeURIComponent(emailAktif);
+                form.target = iframeName;
+
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'payload';
+                input.value = JSON.stringify(payload);
+                form.appendChild(input);
+                document.body.appendChild(form);
+
+                let finished = false;
+                function finish(success, msg) {
+                    if (finished) return;
+                    finished = true;
+                    isSyncing = false;
+                    if (form.parentNode) form.parentNode.removeChild(form);
+                    setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 3000);
+                    if (success) {
+                        if (pendingChangeVersion === versionAtStart) {
+                            hasPendingChanges = false;
+                            setSyncStatus('🔄', 'Memverifikasi...', '#FF9800');
+                            setTimeout(() => { pullFromServer(true).then(resolve); }, 1200);
+                        } else {
+                            setSyncStatus('💾', 'Ada perubahan baru, sync ulang...', '#FF9800');
+                            syncTimer = setTimeout(pushToServer, 500);
+                            resolve();
+                        }
+                    } else {
+                        setSyncStatus('⚠️', msg || 'Gagal sync, akan dicoba lagi', '#f44336');
+                        syncTimer = setTimeout(pushToServer, 8000);
+                        resolve();
+                    }
+                }
+
+                iframe.onload = () => finish(true);
+                let timeout = setTimeout(() => finish(false, 'Gagal sync: timeout'), 15000);
+                iframe.onload = () => { clearTimeout(timeout); finish(true); };
+
+                form.submit();
+            });
+        }
+
+        function manualSync() { pullFromServer(); }
+
+        function persistLocalOnly() {
+            localStorage.setItem(STORAGE_KEYS.PRODUKSI, JSON.stringify(dataProduksi));
+            localStorage.setItem(STORAGE_KEYS.PEMASUKAN, JSON.stringify(dataPemasukan));
+            localStorage.setItem(STORAGE_KEYS.PENGELUARAN, JSON.stringify(dataPengeluaran));
+            localStorage.setItem(STORAGE_KEYS.PO, JSON.stringify(dataPO));
+            localStorage.setItem(STORAGE_KEYS.POPULASI, JSON.stringify(populasi));
+            localStorage.setItem(STORAGE_KEYS.HARGA, JSON.stringify(harga));
+            localStorage.setItem(STORAGE_KEYS.STOK_AWAL, JSON.stringify(stokAwal));
+        }
+
+        window.addEventListener('online', () => { isOnline = true; setSyncStatus('🔄', 'Online lagi, sinkronisasi...'); pushToServer(); });
+        window.addEventListener('offline', () => { isOnline = false; setSyncStatus('📴', 'Offline - pakai data lokal', '#FF9800'); });
+
+        // ==================== STOK ====================
+        function hitungStok() {
+            let totalProdHorn = dataProduksi.reduce((s,p) => s + (p.hornTotal - p.hornTidak), 0);
+            let totalProdElba = dataProduksi.reduce((s,p) => s + (p.elbaTotal - p.elbaTidak), 0);
+            let totalJualHorn = dataPemasukan.filter(p => p.tipe === 'jual' && p.jenis === 'horn').reduce((s,p) => s + p.jumlahButir, 0);
+            let totalJualElba = dataPemasukan.filter(p => p.tipe === 'jual' && p.jenis === 'elba').reduce((s,p) => s + p.jumlahButir, 0);
+            let totalGiftHorn = dataPemasukan.filter(p => p.tipe === 'gift' && p.jenis === 'horn').reduce((s,p) => s + p.jumlahButir, 0);
+            let totalGiftElba = dataPemasukan.filter(p => p.tipe === 'gift' && p.jenis === 'elba').reduce((s,p) => s + p.jumlahButir, 0);
+            return { horn: Math.max(0, stokAwal.horn + totalProdHorn - totalJualHorn - totalGiftHorn), elba: Math.max(0, stokAwal.elba + totalProdElba - totalJualElba - totalGiftElba) };
+        }
+
+        function hitungRataProduksiHarian() {
+            let today = new Date();
+            let batas = new Date(today); batas.setDate(batas.getDate() - 7);
+            let perTgl = new Map();
+            dataProduksi.forEach(p => {
+                let tglObj = new Date(p.tanggal);
+                if (tglObj < batas) return;
+                if (!perTgl.has(p.tanggal)) perTgl.set(p.tanggal, { horn: 0, elba: 0 });
+                let d = perTgl.get(p.tanggal);
+                d.horn += Math.max(0, (p.hornTotal||0) - (p.hornTidak||0));
+                d.elba += Math.max(0, (p.elbaTotal||0) - (p.elbaTidak||0));
+            });
+            let hariCount = perTgl.size;
+            if (hariCount === 0) return { horn: 0, elba: 0, hariData: 0 };
+            let totalHorn = 0, totalElba = 0;
+            for (let [, v] of perTgl) { totalHorn += v.horn; totalElba += v.elba; }
+            return { horn: totalHorn / hariCount, elba: totalElba / hariCount, hariData: hariCount };
+        }
+
+        function estimasiHariPO(kekuranganButir, rataHarianJenis, hariData) {
+            if (kekuranganButir <= 0) return null;
+            if (hariData === 0 || rataHarianJenis <= 0) return 'Belum ada cukup data produksi untuk estimasi';
+            let hari = Math.ceil(kekuranganButir / rataHarianJenis);
+            if (hari <= 0) return null;
+            if (hari === 1) return '⏳ Estimasi terpenuhi: ~1 hari lagi';
+            return `⏳ Estimasi terpenuhi: ~${hari} hari lagi`;
+        }
+        function updateStokDisplay() { let stok = hitungStok(); document.getElementById('stok-horn').innerText = stok.horn; document.getElementById('stok-elba').innerText = stok.elba; return stok; }
+        function setStokAwal() { stokAwal.horn = parseInt(document.getElementById('stok-awal-horn').value)||0; stokAwal.elba = parseInt(document.getElementById('stok-awal-elba').value)||0; queueSync(); updateStokDisplay(); updateDashboard(); alert('Stok awal disimpan!'); }
+
+        function setJualJenis(jenis) {
+            jualJenisAktif = jenis;
+            if(jenis === 'horn'){
+                document.getElementById('jual-btn-horn').classList.add('active');
+                document.getElementById('jual-btn-elba').classList.remove('active');
+            } else {
+                document.getElementById('jual-btn-horn').classList.remove('active');
+                document.getElementById('jual-btn-elba').classList.add('active');
+            }
+        }
+        
+        function setGiftJenis(jenis) {
+            giftJenisAktif = jenis;
+            if(jenis === 'horn'){
+                document.getElementById('gift-btn-horn').classList.add('active');
+                document.getElementById('gift-btn-elba').classList.remove('active');
+            } else {
+                document.getElementById('gift-btn-horn').classList.remove('active');
+                document.getElementById('gift-btn-elba').classList.add('active');
+            }
+        }
+        
+        function setPoJenis(jenis) {
+            poJenisAktif = jenis;
+            if(jenis === 'horn'){
+                document.getElementById('po-btn-horn').classList.add('active');
+                document.getElementById('po-btn-elba').classList.remove('active');
+            } else {
+                document.getElementById('po-btn-horn').classList.remove('active');
+                document.getElementById('po-btn-elba').classList.add('active');
+            }
+        }
+
+        function setPoSatuan(satuan) {
+            poSatuanAktif = satuan;
+            if(satuan === 'butir'){
+                document.getElementById('po-btn-butir').classList.add('active');
+                document.getElementById('po-btn-pack').classList.remove('active');
+                document.getElementById('po-label-jumlah').innerText = 'Jumlah (butir)';
+            } else {
+                document.getElementById('po-btn-butir').classList.remove('active');
+                document.getElementById('po-btn-pack').classList.add('active');
+                document.getElementById('po-label-jumlah').innerText = 'Jumlah (pack)';
+            }
+        }
+
+        function simpanPO() {
+            let nama = document.getElementById('po-nama').value.trim();
+            let wa = document.getElementById('po-wa').value.trim();
+            let jenis = poJenisAktif;
+            let jumlahInput = parseInt(document.getElementById('po-jumlah').value);
+            let lunas = document.getElementById('po-lunas').checked;
+            if(!nama){ alert('Isi nama pembeli!'); return; }
+            if(!jumlahInput || jumlahInput <= 0){ alert('Isi jumlah pesanan!'); return; }
+            let jumlahButir = poSatuanAktif === 'butir' ? jumlahInput : jumlahInput * 10;
+            dataPO.push({ id: Date.now(), tanggal: new Date().toISOString().split('T')[0], jam: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}), nama: nama, wa: wa, jenis: jenis, satuan: poSatuanAktif, jumlah: jumlahInput, jumlahButir: jumlahButir, lunas: lunas, status: 'active' });
+            savePO(); updatePOList(); updateDashboard();
+            alert('PO berhasil disimpan!');
+            document.getElementById('po-nama').value = ''; document.getElementById('po-wa').value = ''; document.getElementById('po-jumlah').value = ''; document.getElementById('po-lunas').checked = false;
+        }
+
+        function realisasiPO(id) {
+            let po = dataPO.find(p => p.id === id);
+            if(!po) return;
+            let stok = hitungStok();
+            let stokTersedia = po.jenis === 'horn' ? stok.horn : stok.elba;
+            if(po.jumlahButir > stokTersedia){ alert(`Stok tidak mencukupi! Stok tersisa: ${stokTersedia} butir`); return; }
+            if(po.lunas){
+                let hargaJual = po.jenis === 'horn' ? harga.horn : harga.elba;
+                let total = po.jumlahButir * hargaJual;
+                dataPemasukan.push({ id: Date.now(), tanggal: new Date().toISOString().split('T')[0], tipe: 'jual', jenis: po.jenis, satuan: po.satuan, jumlah: po.jumlah, jumlahButir: po.jumlahButir, harga: hargaJual, total: total, pembeli: po.nama, wa: po.wa || '', dariPO: true });
+                po.status = 'selesai';
+                po.tanggalSelesai = new Date().toISOString().split('T')[0];
+                savePemasukan(); savePO(); updatePOList(); updateDashboard(); updateRiwayatPemasukan(); updatePelangganList();
+                alert(`PO ${po.nama} selesai! Penjualan tercatat otomatis.`);
+            } else {
+                pendingPOId = id;
+                document.getElementById('modal-harga-input').value = po.jenis === 'horn' ? harga.horn : harga.elba;
+                document.getElementById('modal-harga').style.display = 'flex';
+            }
+        }
+
+        function closeModalHarga() { document.getElementById('modal-harga').style.display = 'none'; pendingPOId = null; }
+        function konfirmasiRealisasiHarga() {
+            let hargaInput = parseInt(document.getElementById('modal-harga-input').value);
+            if(!hargaInput || hargaInput <= 0){ alert('Isi harga yang valid!'); return; }
+            let po = dataPO.find(p => p.id === pendingPOId);
+            if(!po){ closeModalHarga(); return; }
+            let stok = hitungStok();
+            let stokTersedia = po.jenis === 'horn' ? stok.horn : stok.elba;
+            if(po.jumlahButir > stokTersedia){ alert(`Stok tidak mencukupi! Stok tersisa: ${stokTersedia} butir`); closeModalHarga(); return; }
+            let total = po.jumlahButir * hargaInput;
+            dataPemasukan.push({ id: Date.now(), tanggal: new Date().toISOString().split('T')[0], tipe: 'jual', jenis: po.jenis, satuan: po.satuan, jumlah: po.jumlah, jumlahButir: po.jumlahButir, harga: hargaInput, total: total, pembeli: po.nama, wa: po.wa || '', dariPO: true });
+            po.status = 'selesai';
+            po.tanggalSelesai = new Date().toISOString().split('T')[0];
+            savePemasukan(); savePO(); updatePOList(); updateDashboard(); updateRiwayatPemasukan(); updatePelangganList(); closeModalHarga();
+            alert(`PO ${po.nama} selesai! Penjualan tercatat otomatis.`);
+        }
+
+        function hash_deletePO(id) { if(confirm('Hapus PO ini?')){ dataPO = dataPO.filter(p => p.id !== id); savePO(); updatePOList(); updateDashboard(); alert('PO dihapus!'); } }
+
+        function updatePOList() {
+            let stok = hitungStok();
+            let stokSisaHorn = stok.horn;
+            let stokSisaElba = stok.elba;
+            let rata = hitungRataProduksiHarian();
+            let activePO = dataPO.filter(p => p.status === 'active').sort((a,b) => a.id - b.id);
+            let container = document.getElementById('po-list');
+            if(activePO.length === 0){ container.innerHTML = '<div class="info-box" style="text-align:center;">Belum ada PO aktif</div>'; } else {
+                let html = '';
+                let totalKekuranganHorn = 0, totalKekuranganElba = 0;
+                activePO.forEach(po => {
+                    let stokCukup = false;
+                    let kekurangan = 0;
+                    if(po.jenis === 'horn') {
+                        stokCukup = totalKekuranganHorn === 0 && po.jumlahButir <= stokSisaHorn;
+                        if(stokCukup) { stokSisaHorn -= po.jumlahButir; }
+                        else { kekurangan = totalKekuranganHorn + Math.max(0, po.jumlahButir - stokSisaHorn); totalKekuranganHorn = kekurangan; stokSisaHorn = 0; }
+                    } else {
+                        stokCukup = totalKekuranganElba === 0 && po.jumlahButir <= stokSisaElba;
+                        if(stokCukup) { stokSisaElba -= po.jumlahButir; }
+                        else { kekurangan = totalKekuranganElba + Math.max(0, po.jumlahButir - stokSisaElba); totalKekuranganElba = kekurangan; stokSisaElba = 0; }
+                    }
+                    let stokInfo = stokCukup ? '✅ Stok cukup!' : '';
+                    let estimasiInfo = '';
+                    if (!stokCukup) {
+                        let rataJenis = po.jenis === 'horn' ? rata.horn : rata.elba;
+                        let est = estimasiHariPO(kekurangan, rataJenis, rata.hariData);
+                        if (est) estimasiInfo = `<div style="color:#FF9800; font-size:12px; margin-top:3px;">${est}</div>`;
+                    }
+                    html += `<div class="po-item"><div class="po-header-row"><span class="nama">📋 ${po.nama}</span><span class="po-actions"><button class="small icon-only compact success" onclick="realisasiPO(${po.id})" ${!stokCukup ? 'disabled style="opacity:0.5;"' : ''}>✓ Realisasi</button><button class="small icon-only compact danger" onclick="hash_deletePO(${po.id})">🗑️</button></span></div><div class="po-meta-row"><span>${po.jenis === 'horn' ? '🐔 Horn' : '🐔 Elba'} ${po.jumlah}${po.satuan === 'butir' ? 'btr' : 'pack'} (${po.jumlahButir}btr)</span><span>${po.lunas ? '<span class="status-lunas">✅ Lunas</span>' : '<span class="status-belum">💰 Belum bayar</span>'}</span><span>📅 ${po.tanggal}</span>${stokCukup ? `<span class="stok-cukup">${stokInfo}</span>` : ''}</div>${estimasiInfo}</div>`;
+                });
+                container.innerHTML = html;
+            }
+            let historyContainer = document.getElementById('po-history');
+            let selesaiPO = dataPO.filter(p => p.status === 'selesai');
+            if(selesaiPO.length === 0){ historyContainer.innerHTML = '<div class="info-box" style="text-align:center;">Belum ada PO selesai</div>'; } else {
+                let html = '';
+                selesaiPO.slice(-15).reverse().forEach(po => { html += `<div class="riwayat-item" style="border-left-color:#2E7D32;"><div class="riwayat-header"><span>✅ ${po.nama}</span><span>${po.tanggal}</span></div><div class="riwayat-detail">${po.jenis === 'horn' ? 'Horn' : 'Elba'} | ${po.jumlah} ${po.satuan === 'butir' ? 'butir' : 'pack'} | ${po.lunas ? 'Lunas' : 'Belum bayar'}</div></div>`; });
+                historyContainer.innerHTML = html;
+            }
+        }
+
+        function updatePOQueueDashboard() {
+            let stok = hitungStok();
+            let stokSisaHorn = stok.horn;
+            let stokSisaElba = stok.elba;
+            let rata = hitungRataProduksiHarian();
+            let allActivePO = dataPO.filter(p => p.status === 'active').sort((a,b) => a.id - b.id);
+            let container = document.getElementById('po-queue-dashboard');
+            let banner = document.getElementById('po-notif-banner');
+            if(allActivePO.length === 0){ container.innerHTML = '<div class="info-box" style="text-align:center;">Belum ada PO</div>'; if(banner) banner.innerHTML = ''; return; }
+            let html = '';
+            let totalKekuranganHorn = 0, totalKekuranganElba = 0;
+            let siapCount = 0;
+            allActivePO.forEach((po, idx) => {
+                let stokCukup = false;
+                let kekurangan = 0;
+                if(po.jenis === 'horn') {
+                    stokCukup = totalKekuranganHorn === 0 && po.jumlahButir <= stokSisaHorn;
+                    if(stokCukup) { stokSisaHorn -= po.jumlahButir; }
+                    else { kekurangan = totalKekuranganHorn + Math.max(0, po.jumlahButir - stokSisaHorn); totalKekuranganHorn = kekurangan; stokSisaHorn = 0; }
+                } else {
+                    stokCukup = totalKekuranganElba === 0 && po.jumlahButir <= stokSisaElba;
+                    if(stokCukup) { stokSisaElba -= po.jumlahButir; }
+                    else { kekurangan = totalKekuranganElba + Math.max(0, po.jumlahButir - stokSisaElba); totalKekuranganElba = kekurangan; stokSisaElba = 0; }
+                }
+                if (stokCukup) siapCount++;
+                if (idx >= 5) return;
+                let stokInfo = stokCukup ? '✅ Stok cukup!' : '';
+                let estimasiInfo = '';
+                if (!stokCukup) {
+                    let rataJenis = po.jenis === 'horn' ? rata.horn : rata.elba;
+                    let est = estimasiHariPO(kekurangan, rataJenis, rata.hariData);
+                    if (est) estimasiInfo = `<div class="po-status" style="color:#FF9800; font-size:11px;">${est}</div>`;
+                }
+                html += `<div class="po-item" style="padding:8px 10px;"><div class="po-header-row" style="margin-bottom:2px;"><span class="nama" style="font-size:13px;">${idx+1}. ${po.nama}</span></div><div class="po-meta-row"><span>${po.jenis === 'horn' ? '🐔 Horn' : '🐔 Elba'} ${po.jumlahButir}btr</span><span>${po.lunas ? '<span class="status-lunas">✅ Lunas</span>' : '<span class="status-belum">💰 Belum bayar</span>'}</span>${stokCukup ? `<span class="stok-cukup">${stokInfo}</span>` : ''}</div>${estimasiInfo}</div>`;
+            });
+            container.innerHTML = html;
+            if (banner) {
+                if (siapCount > 0) {
+                    banner.innerHTML = `<div class="card" style="background:#E8F5E9; border:1px solid #66BB6A; padding:14px 16px; margin-bottom:12px; cursor:pointer;" onclick="showTab('po')">🔔 <b>${siapCount} PO siap direalisasi</b> — stok sudah cukup, cek tab PO</div>`;
+                } else {
+                    banner.innerHTML = '';
+                }
+            }
+        }
+
+        function savePO() { queueSync(); }
+
+        // ==================== PELANGGAN ====================
+        function analisisPelanggan() {
+            let perPembeli = new Map();
+            dataPemasukan.filter(p => p.tipe === 'jual' && p.pembeli && p.pembeli !== '-').forEach(p => {
+                if (!perPembeli.has(p.pembeli)) perPembeli.set(p.pembeli, { transaksi: [], wa: '' });
+                let d = perPembeli.get(p.pembeli);
+                d.transaksi.push({ tanggal: p.tanggal, total: p.total, jumlahButir: p.jumlahButir, jenis: p.jenis });
+                if (p.wa) d.wa = p.wa;
+            });
+
+            let today = new Date();
+            let hasil = [];
+            for (let [nama, d] of perPembeli) {
+                let tgls = d.transaksi.map(t => new Date(t.tanggal)).sort((a,b) => a-b);
+                let totalBelanja = d.transaksi.reduce((s,t) => s + t.total, 0);
+                let totalButir = d.transaksi.reduce((s,t) => s + t.jumlahButir, 0);
+                let jumlahTransaksi = d.transaksi.length;
+                let tglTerakhir = tgls[tgls.length - 1];
+                let hariSejakTerakhir = Math.floor((today - tglTerakhir) / (1000*60*60*24));
+
+                let rataCycle = null;
+                if (tgls.length >= 2) {
+                    let totalSelisih = 0;
+                    for (let i = 1; i < tgls.length; i++) totalSelisih += (tgls[i] - tgls[i-1]) / (1000*60*60*24);
+                    rataCycle = totalSelisih / (tgls.length - 1);
+                }
+
+                let statusFollowUp = null;
+                let telatHari = 0;
+                if (rataCycle !== null && rataCycle > 0) {
+                    telatHari = hariSejakTerakhir - rataCycle;
+                    statusFollowUp = telatHari > 0;
+                }
+
+                hasil.push({ nama, wa: d.wa, totalBelanja, totalButir, jumlahTransaksi, tglTerakhir: tglTerakhir.toISOString().split('T')[0], hariSejakTerakhir, rataCycle, statusFollowUp, telatHari });
+            }
+            return hasil;
+        }
+
+        function waLink(nomor, pesan) {
+            if (!nomor) return null;
+            let bersih = nomor.replace(/[^0-9]/g, '');
+            if (bersih.startsWith('0')) bersih = '62' + bersih.slice(1);
+            else if (!bersih.startsWith('62')) bersih = '62' + bersih;
+            return `https://wa.me/${bersih}${pesan ? '?text=' + encodeURIComponent(pesan) : ''}`;
+        }
+
+        function updatePelangganList() {
+            let data = analisisPelanggan();
+            let sortMode = document.getElementById('pelanggan-sort') ? document.getElementById('pelanggan-sort').value : 'terlambat';
+
+            let followUpContainer = document.getElementById('pelanggan-followup');
+            let perluFollowUp = data.filter(p => p.statusFollowUp === true).sort((a,b) => b.telatHari - a.telatHari);
+            if (perluFollowUp.length === 0) {
+                followUpContainer.innerHTML = '<div class="info-box" style="text-align:center;">Tidak ada pelanggan yang telat dari siklus biasanya 👍</div>';
+            } else {
+                let html = '';
+                perluFollowUp.forEach(p => {
+                    let pesanDefault = `Halo Kak ${p.nama}, telur premium Omega-3 & DHA dari 4R Farm sudah restock segar hari ini. Mau kami sisipkan slot orderan untuk minggu ini? 🥚🥚`;
+                    let link = waLink(p.wa, pesanDefault);
+                    html += `<div class="po-item po-item-flex"><div class="po-info"><div class="nama">⚠️ ${p.nama}</div><div class="detail">Biasanya rutin order tiap ~${Math.round(p.rataCycle)} hari, sekarang sudah telat ${p.hariSejakTerakhir} hari</div><div class="po-status">Terakhir order: ${p.tglTerakhir} | Total: ${formatRupiah(p.totalBelanja)}</div></div>${link ? `<div class="po-actions"><a href="${link}" target="_blank" class="small success" style="text-decoration:none; display:inline-block; text-align:center; padding: 8px 12px; border-radius:12px; font-weight:600;">💬 Chat WA</a></div>` : ''}</div>`;
+                });
+                followUpContainer.innerHTML = html;
+            }
+
+            let listContainer = document.getElementById('pelanggan-list');
+            if (data.length === 0) { listContainer.innerHTML = '<div class="info-box" style="text-align:center;">Belum ada data pelanggan</div>'; return; }
+            let sorted = [...data];
+            if (sortMode === 'total') sorted.sort((a,b) => b.totalBelanja - a.totalBelanja);
+            else if (sortMode === 'terakhir') sorted.sort((a,b) => a.hariSejakTerakhir - b.hariSejakTerakhir);
+            else if (sortMode === 'frekuensi') sorted.sort((a,b) => b.jumlahTransaksi - a.jumlahTransaksi);
+            else sorted.sort((a,b) => (b.statusFollowUp === true ? b.telatHari : -999) - (a.statusFollowUp === true ? a.telatHari : -999));
+
+            let html = '';
+            sorted.forEach(p => {
+                let cycleInfo = p.rataCycle !== null ? `Siklus rata-rata: ~${Math.round(p.rataCycle)} hari` : 'Baru 1x transaksi';
+                let statusBadge = p.statusFollowUp === true ? '<span class="status-belum">⚠️ Perlu follow-up</span>' : (p.statusFollowUp === false ? '<span class="status-lunas">✅ Masih normal</span>' : '');
+                let pesanDefault = `Halo Kak ${p.nama}, telur premium Omega-3 & DHA dari 4R Farm sudah restock segar hari ini. Mau kami sisipkan slot orderan untuk minggu ini? 🥚🥚`;
+                let link = waLink(p.wa, pesanDefault);
+                html += `<div class="po-item po-item-flex"><div class="po-info"><div class="nama">👤 ${p.nama}</div><div class="detail">${p.jumlahTransaksi}x transaksi | ${p.totalButir} butir | ${formatRupiah(p.totalBelanja)}</div><div class="po-status">${cycleInfo}</div><div class="po-status">Terakhir beli: ${p.tglTerakhir} (${p.hariSejakTerakhir} hari lalu)</div><div class="po-status">${statusBadge}</div></div>${link ? `<div class="po-actions"><a href="${link}" target="_blank" class="small success" style="text-decoration:none; display:inline-block; text-align:center; padding: 8px 12px; border-radius:12px; font-weight:600;">💬 WA</a></div>` : ''}</div>`;
+            });
+            listContainer.innerHTML = html;
+        }
+
+        // ==================== PRODUKSI ====================
+        function hitungLayak() {
+            let ht = parseInt(document.getElementById('horn-total').value)||0, htd = parseInt(document.getElementById('horn-tidak-layak').value)||0;
+            let et = parseInt(document.getElementById('elba-total').value)||0, etd = parseInt(document.getElementById('elba-tidak-layak').value)||0;
+            document.getElementById('horn-layak').innerText = Math.max(0, ht-htd);
+            document.getElementById('elba-layak').innerText = Math.max(0, et-etd);
+        }
+
+        function simpanProduksi() {
+            let tgl = document.getElementById('produksi-tanggal').value, jam = document.getElementById('produksi-jam').value, catatan = document.getElementById('produksi-catatan').value;
+            if(!tgl||!jam){alert('Isi tanggal dan jam!');return;}
+            let ht = parseInt(document.getElementById('horn-total').value)||0, htd = parseInt(document.getElementById('horn-tidak-layak').value)||0;
+            let et = parseInt(document.getElementById('elba-total').value)||0, etd = parseInt(document.getElementById('elba-tidak-layak').value)||0;
+            if(ht===0&&et===0){alert('Isi minimal salah satu produksi!');return;}
+            dataProduksi.push({ id:Date.now(), tanggal:tgl, jam:jam, hornTotal:ht, hornTidak:htd, hornLayak:ht-htd, elbaTotal:et, elbaTidak:etd, elbaLayak:et-etd, catatan:catatan });
+            dataProduksi.sort((a,b)=>b.tanggal.localeCompare(a.tanggal)||b.jam.localeCompare(a.jam));
+            saveProduksi(); updateDashboard(); updateRiwayatProduksi(); updateExportStats();
+            alert('Produksi disimpan!');
+            document.getElementById('horn-total').value=0; document.getElementById('horn-tidak-layak').value=0;
+            document.getElementById('elba-total').value=0; document.getElementById('elba-tidak-layak').value=0;
+            document.getElementById('produksi-catatan').value=''; document.getElementById('produksi-jam').value=''; hitungLayak();
+        }
+
+        function hapusProduksi(id){ if(confirm('Hapus entry ini?')){ dataProduksi=dataProduksi.filter(p=>p.id!==id); saveProduksi(); updateDashboard(); updateRiwayatProduksi(); updateExportStats(); alert('Dihapus!'); } }
+
+        function updateRiwayatProduksi(){
+            let container=document.getElementById('riwayat-produksi');
+            if(dataProduksi.length===0){ container.innerHTML='<div class="info-box" style="text-align:center;">Belum ada data</div>'; return; }
+            let html='';
+            [...dataProduksi].reverse().slice(0,15).forEach(p=>{ html+=`<div class="riwayat-item produksi"><div class="riwayat-header"><span>📅 ${p.tanggal} ${p.jam}</span><span>${p.catatan||'-'}</span></div><div class="riwayat-detail">🐔 Horn: ${p.hornTotal} butir (tidak layak ${p.hornTidak}) → layak ${p.hornLayak}<br>🐔 Elba: ${p.elbaTotal} butir (tidak layak ${p.elbaTidak}) → layak ${p.elbaLayak}</div><div class="riwayat-actions"><button class="delete-entry" onclick="hapusProduksi(${p.id})">🗑️ Hapus</button></div></div>`; });
+            container.innerHTML=html;
+        }
+
+        // ==================== PEMASUKAN ====================
+        function toggleTransaksiJenis(){
+            let jenis=document.querySelector('input[name="transaksi-jenis"]:checked').value;
+            document.getElementById('form-jual').classList.add('hidden');
+            document.getElementById('form-gift').classList.add('hidden');
+            document.getElementById('form-kas').classList.add('hidden');
+            if(jenis==='jual') document.getElementById('form-jual').classList.remove('hidden');
+            else if(jenis==='gift') document.getElementById('form-gift').classList.remove('hidden');
+            else document.getElementById('form-kas').classList.remove('hidden');
+            setJualJenis('horn');
+            setGiftJenis('horn');
+        }
+
+        function setSatuan(satuan){
+            satuanAktif=satuan;
+            if(satuan==='butir'){
+                let bb=document.getElementById('btn-butir'); if(bb) bb.classList.add('active'); let bp=document.getElementById('btn-pack'); if(bp) bp.classList.remove('active');
+                setText('label-jumlah','Jumlah (butir)'); setText('label-harga','Harga per butir (Rp)');
+            }else{
+                let bb2=document.getElementById('btn-butir'); if(bb2) bb2.classList.remove('active'); let bp2=document.getElementById('btn-pack'); if(bp2) bp2.classList.add('active');
+                setText('label-jumlah','Jumlah (pack)'); setText('label-harga','Harga per pack (Rp)');
+            }
+        }
+
+        function simpanPemasukan(){
+            let tgl=document.getElementById('pemasukan-tanggal').value;
+            let jenisTransaksi=document.querySelector('input[name="transaksi-jenis"]:checked').value;
+            if(!tgl){alert('Pilih tanggal!');return;}
+            if(jenisTransaksi==='jual'){
+                let jenis = jualJenisAktif;
+                let jumlah=parseInt(document.getElementById('jual-jumlah').value);
+                let hargaInput=parseInt(document.getElementById('jual-harga').value);
+                let pembeli=document.getElementById('jual-pembeli').value.trim();
+                let wa=document.getElementById('jual-wa').value.trim();
+                if(!jumlah||!hargaInput){alert('Isi jumlah dan harga!');return;}
+                if(!pembeli){alert('Nama pembeli wajib!');return;}
+                let jumlahButir=satuanAktif==='butir'?jumlah:jumlah*10, total=jumlah*hargaInput;
+                dataPemasukan.push({id:Date.now(), tanggal:tgl, tipe:'jual', jenis:jenis, satuan:satuanAktif, jumlah:jumlah, jumlahButir:jumlahButir, harga:hargaInput, total:total, pembeli:pembeli, wa:wa});
+                alert('Penjualan berhasil!');
+                document.getElementById('jual-jumlah').value=''; document.getElementById('jual-harga').value=''; document.getElementById('jual-pembeli').value=''; document.getElementById('jual-wa').value='';
+            }else if(jenisTransaksi==='gift'){
+                let jenis = giftJenisAktif;
+                let jumlah=parseInt(document.getElementById('gift-jumlah').value);
+                let penerima=document.getElementById('gift-penerima').value.trim();
+                if(!jumlah||jumlah<=0){alert('Isi jumlah telur!');return;}
+                if(!penerima){alert('Isi nama penerima!');return;}
+                dataPemasukan.push({id:Date.now(), tanggal:tgl, tipe:'gift', jenis:jenis, jumlahButir:jumlah, penerima:penerima, total:0});
+                alert('Gift berhasil dicatat!');
+                document.getElementById('gift-jumlah').value=''; document.getElementById('gift-penerima').value='';
+            }else{
+                let nominal=parseInt(document.getElementById('kas-nominal').value), pembeli=document.getElementById('kas-pembeli').value.trim();
+                if(!nominal||nominal<=0){alert('Isi nominal!');return;}
+                dataPemasukan.push({id:Date.now(), tanggal:tgl, tipe:'kas', nominal:nominal, pembeli:pembeli||'-'});
+                alert('Kas berhasil!');
+                document.getElementById('kas-nominal').value=''; document.getElementById('kas-pembeli').value='';
+            }
+            dataPemasukan.sort((a,b)=>a.tanggal.localeCompare(b.tanggal));
+            savePemasukan(); updateDashboard(); updateRiwayatPemasukan(); updatePelangganList(); updateExportStats();
+        }
+
+        function hash_deletePemasukan(id){ if(confirm('Hapus transaksi ini?')){ dataPemasukan=dataPemasukan.filter(p=>p.id!==id); savePemasukan(); updateDashboard(); updateRiwayatPemasukan(); updatePelangganList(); updateExportStats(); alert('Dihapus!'); } }
+
+        function updateRiwayatPemasukan(){
+            let container=document.getElementById('riwayat-pemasukan');
+            if(dataPemasukan.length===0){ container.innerHTML='<div class="info-box" style="text-align:center;">Belum ada data</div>'; return; }
+            let html='';
+            [...dataPemasukan].reverse().slice(0,15).forEach(p=>{
+                let tipeClass='', tipeText='', detailText='';
+                if(p.tipe==='jual'){ tipeClass='jual'; tipeText='💰 PENJUALAN'; detailText=`${p.jenis==='horn'?'Horn':'Elba'} | ${p.jumlahButir} butir | ${formatRupiah(p.total)} | ${p.pembeli}`; }
+                else if(p.tipe==='gift'){ tipeClass='gift'; tipeText='🎁 GIFT'; detailText=`${p.jenis==='horn'?'Horn':'Elba'} | ${p.jumlahButir} butir | ke: ${p.penerima}`; }
+                else{ tipeClass='kas'; tipeText='📝 KAS'; detailText=`${formatRupiah(p.nominal)} | ${p.pembeli!=='-'?p.pembeli:''}`; }
+                html+=`<div class="riwayat-item ${tipeClass}"><div class="riwayat-header"><span>${tipeText}</span><span>${p.tanggal}</span></div><div class="riwayat-detail">${detailText}</div><div class="riwayat-actions"><button class="delete-entry" onclick="hash_deletePemasukan(${p.id})">🗑️ Hapus</button></div></div>`;
+            });
+            container.innerHTML=html;
+        }
+
+        // ==================== PENGELUARAN ====================
+        function simpanPengeluaran(){
+            let tgl=document.getElementById('pengeluaran-tanggal').value, kategori=document.getElementById('pengeluaran-kategori').value, nominal=parseInt(document.getElementById('pengeluaran-nominal').value), keterangan=document.getElementById('pengeluaran-keterangan').value;
+            if(!tgl||!nominal){alert('Isi tanggal dan nominal!');return;}
+            dataPengeluaran.push({id:Date.now(), tanggal:tgl, kategori:kategori, nominal:nominal, keterangan:keterangan});
+            dataPengeluaran.sort((a,b)=>a.tanggal.localeCompare(b.tanggal));
+            savePengeluaran(); updateDashboard(); updateRiwayatPengeluaran(); updateExportStats();
+            alert('Pengeluaran berhasil!');
+            document.getElementById('pengeluaran-nominal').value=''; document.getElementById('pengeluaran-keterangan').value='';
+        }
+
+        function hash_deletePengeluaran(id){ if(confirm('Hapus transaksi pengeluaran ini?')){ dataPengeluaran=dataPengeluaran.filter(p=>p.id!==id); savePengeluaran(); updateDashboard(); updateRiwayatPengeluaran(); updateExportStats(); alert('Dihapus!'); } }
+
+        function updateRiwayatPengeluaran(){
+            let container=document.getElementById('riwayat-pengeluaran');
+            if(!container) return;
+            if(dataPengeluaran.length===0){ container.innerHTML='<div class="info-box" style="text-align:center;">Belum ada data pengeluaran</div>'; return; }
+            let kategoriMap = { pakan: '🍚 Pakan', obat: '💊 Obat', perawatan: '🔨 Perawatan', lainnya: '📦 Lainnya' };
+            let html='';
+            [...dataPengeluaran].reverse().slice(0,15).forEach(p=>{
+                html+=`<div class="riwayat-item raw_pengeluaran"><div class="riwayat-header"><span>💸 ${kategoriMap[p.kategori] || p.kategori}</span><span>${p.tanggal}</span></div><div class="riwayat-detail">${formatRupiah(p.nominal)} | ${p.keterangan || '-'}</div><div class="riwayat-actions"><button class="delete-entry" onclick="hash_deletePengeluaran(${p.id})">🗑️ Hapus</button></div></div>`;
+            });
+            container.innerHTML=html;
+        }
+
+        // ==================== SAVE/LOAD HANDLERS ====================
+        function saveProduksi(){ queueSync(); }
+        function savePemasukan(){ queueSync(); }
+        function savePengeluaran(){ queueSync(); }
+
+        function simpanPopulasi(){ populasi.horn=parseInt(document.getElementById('setting-horn-pop').value)||0; populasi.elba=parseInt(document.getElementById('setting-elba-pop').value)||0; queueSync(); updateDashboard(); alert('Populasi disimpan!'); }
+        function simpanHarga(){ 
+            harga.horn=parseInt(document.getElementById('setting-horn-price').value)||0; 
+            harga.elba=parseInt(document.getElementById('setting-elba-price').value)||0; 
+            queueSync(); 
+            updateHargaDisplay(); 
+            alert('Harga disimpan!'); 
+        }
+        function updateHargaDisplay(){ 
+            setText('harga-horn-display', harga.horn); 
+            setText('harga-elba-display', harga.elba); 
+            let sh=document.getElementById('setting-horn-price'); if(sh) sh.value=harga.horn;
+            let se=document.getElementById('setting-elba-price'); if(se) se.value=harga.elba;
+            let jh=document.getElementById('jual-btn-horn'); if(jh) jh.innerHTML = `🐔 HORN (Rp ${harga.horn})`;
+            let je=document.getElementById('jual-btn-elba'); if(je) je.innerHTML = `🐔 ELBA (Rp ${harga.elba})`;
+        }
+        function updatePengaturanForm(){ 
+            let hp=document.getElementById('setting-horn-pop'); if(hp) hp.value=populasi.horn; 
+            let ep=document.getElementById('setting-elba-pop'); if(ep) ep.value=populasi.elba; 
+            document.getElementById('app-user-email-input').value = localStorage.getItem('user_email') || '';
+        }
+        function updateExportStats(){ let pembeliUnik=new Set(dataPemasukan.filter(p=>p.tipe==='jual'&&p.pembeli).map(p=>p.pembeli)); setText('stat-produksi', dataProduksi.length); setText('stat-pemasukan', dataPemasukan.length); setText('stat-pengeluaran', dataPengeluaran.length); setText('stat-pembeli', pembeliUnik.size); }
+
+        function loadAllData(){
+            let p=localStorage.getItem(STORAGE_KEYS.PRODUKSI); if(p) dataProduksi=JSON.parse(p);
+            let pm=localStorage.getItem(STORAGE_KEYS.PEMASUKAN); if(pm) dataPemasukan=JSON.parse(pm);
+            let pg=localStorage.getItem(STORAGE_KEYS.PENGELUARAN); if(pg) dataPengeluaran=JSON.parse(pg);
+            let pop=localStorage.getItem(STORAGE_KEYS.POPULASI); if(pop) populasi=JSON.parse(pop);
+            let hr=localStorage.getItem(STORAGE_KEYS.HARGA); if(hr) harga=JSON.parse(hr);
+            let st=localStorage.getItem(STORAGE_KEYS.STOK_AWAL); if(st) stokAwal=JSON.parse(st);
+            let po=localStorage.getItem(STORAGE_KEYS.PO); if(po) dataPO=JSON.parse(po);
+            updateDashboard(); updatePengaturanForm(); updateHargaDisplay(); updateExportStats(); updateRiwayatProduksi(); updateRiwayatPemasukan(); updatePelangganList(); updatePOList(); updateRiwayatPengeluaran();
+            
+            // Logika Cloud dipanggil pasif tanpa membekukan thread navigasi utama browser
+            setTimeout(function() { pullFromServer(true); }, 500);
+        }
+
+        // ==================== DASHBOARD & EVALUATION RENDERS ====================
+        function updateDashboard(){
+            setText('pop-horn', populasi.horn); setText('pop-elba', populasi.elba);
+            let now=new Date(), bulanIni=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            let pemasukan=dataPemasukan.filter(p=>p.tanggal.startsWith(bulanIni)&&(p.tipe==='jual'?p.total:(p.tipe==='kas'?p.nominal:0))).reduce((s,p)=>s+(p.tipe==='jual'?p.total:(p.tipe==='kas'?p.nominal:0)),0);
+            let pengeluaran=dataPengeluaran.filter(p=>p.tanggal.startsWith(bulanIni)).reduce((s,p)=>s+p.nominal,0);
+            setText('dash-pemasukan', formatRupiah(pemasukan));
+            setText('dash-pengeluaran', formatRupiah(pengeluaran));
+            let laba=pemasukan-pengeluaran, labaEl=document.getElementById('dash-laba');
+            if(labaEl){ labaEl.innerText=formatRupiah(laba); if(laba<0) labaEl.classList.add('negative'); else labaEl.classList.remove('negative'); }
+            let produksiPerTgl=new Map();
+            dataProduksi.forEach(p=>{ if(!produksiPerTgl.has(p.tanggal)) bandwidth_set(produksiPerTgl, p.tanggal); });
+            function bandwidth_set(map, key){ map.set(key, {horn:0, elba:0}); }
+            dataProduksi.forEach(p=>{ let d=produksiPerTgl.get(p.tanggal); d.horn+=p.hornTotal; d.elba+=p.elbaTotal; });
+            let totalHDP=0, hari=0;
+            for(let[tgl,val] of Bird_prod(produksiPerTgl)){ if(tgl.startsWith(bulanIni)){ let totalAyam=populasi.horn+populasi.elba; totalHDP+=totalAyam>0?((val.horn+val.elba)/totalAyam*100):0; hari++; } }
+            function Bird_prod(m) { return m.entries(); }
+            setText('dash-hdp', (hari>0?(totalHDP/hari).toFixed(1):0)+'%');
+            updateStokDisplay(); updateEvaluasi(); updateTrendChart(); updateTopPembeli(); updateGiftSummary(); updatePOQueueDashboard();
+        }
+
+        function updateEvaluasi(){
+            let last30=dataProduksi.slice(-30);
+            let th=0, thd=0, te=0, ted=0;
+            last30.forEach(p=>{ th+=p.hornTotal; thd+=p.hornTidak; te+=p.elbaTotal; ted+=p.elbaTidak; });
+            let ph=th>0?(thd/th*100).toFixed(1):0, pe=te>0?(ted/te*100).toFixed(1):0;
+            let getStatus=(p)=>p<5?'<span class="badge badge-success">✅ Ideal (<5%)</span>':(p<10?'<span class="badge badge-warning">⚠️ Perlu Perhatian</span>':'<span class="badge badge-danger">🔴 Serius</span>');
+            document.getElementById('evaluasi-container').innerHTML=`<div class="list-item"><div class="list-item-title">🐔 Horn</div><div>Total:${th} butir | Tidak layak:${thd} butir (${ph}%)</div><div>${getStatus(ph)}</div></div><div class="list-item"><div class="list-item-title">🐔 Elba</div><div>Total:${te} butir | Tidak layak:${ted} butir (${pe}%)</div><div>${getStatus(pe)}</div></div>${ph>5||pe>5?'<div class="alert alert-warning"><strong>💡 Rekomendasi:</strong><br>- Periksa kualitas pakan<br>- Cek kesehatan ayam</div>':'<div class="alert alert-success">✅ Kualitas produksi telur sangat baik!</div>'}`;
+        }
+
+        document.getElementById('pelanggan-sort').value = 'terlambat';
+
+        function updateTrendChart(){
+            let produksiPerTgl=new Map();
+            dataProduksi.forEach(p=>{ if(!produksiPerTgl.has(p.tanggal)) produksiPerTgl.set(p.tanggal,{horn:0,elba:0}); let d=produksiPerTgl.get(p.tanggal); d.horn+=p.hornTotal; d.elba+=p.elbaTotal; });
+            let dates=Array.from(produksiPerTgl.keys()).sort().slice(-7);
+            let container=document.getElementById('trend-chart');
+            if(dates.length===0){ container.innerHTML='<div style="text-align:center;color:#999;">Belum ada data</div>'; return; }
+            let html='';
+            dates.forEach(tgl=>{ let val=produksiPerTgl.get(tgl); let total=val.horn+val.elba; let max=populasi.horn+populasi.elba; let persen=max>0?(total/max*100):0; html+=`<div class="chart-bar"><div class="chart-label">${tgl.slice(5)}</div><div class="chart-bar-fill" style="width:${persen}%;"></div><div style="width:50px;text-align:right;">${total}</div></div>`; });
+            container.innerHTML=html;
+        }
+
+        function updateTopPembeli(){
+            let map=new Map();
+            dataPemasukan.forEach(p=>{ if(p.tipe==='jual'&&p.pembeli) map.set(p.pembeli,(map.get(p.pembeli)||0)+p.total); });
+            let sorted=Array.from(map.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
+            let container=document.getElementById('top-pembeli');
+            if(sorted.length===0){ container.innerHTML='<div style="text-align:center;color:#999;">Belum ada data</div>'; return; }
+            let html=''; sorted.forEach(([n,t])=>{ html+=`<div class="list-item"><div class="list-item-title">👤 ${n}</div><div class="list-item-detail">Total Belanja: ${formatRupiah(t)}</div></div>`; });
+            container.innerHTML=html;
+        }
+
+        function updateGiftSummary(){
+            let gift=dataPemasukan.filter(p=>p.tipe==='gift');
+            let th=gift.filter(g=>g.jenis==='horn').reduce((s,g)=>s+g.jumlahButir,0);
+            let te=gift.filter(g=>g.jenis==='elba').reduce((s,g)=>s+g.jumlahButir,0);
+            let penerima=new Map();
+            gift.forEach(g=>penerima.set(g.penerima,(penerima.get(g.penerima)||0)+g.jumlahButir));
+            let top=Array.from(penerima.entries()).sort((a,b)=>b[1]-a[1]).slice(0,3);
+            let html=`<div class="stats-grid"><div class="stat-card"><div class="stat-value">${th}</div><div class="stat-label">Gift Horn (butir)</div></div><div class="stat-card"><div class="stat-value">${te}</div><div class="stat-label">Gift Elba (butir)</div></div></div>`;
+            if(top.length>0){ html+=`<div><strong>Top Penerima Gift:</strong></div>`; top.forEach(([n,j])=>{ html+=`<div class="list-item"><div class="list-item-title">👤 ${n}</div><div class="list-item-detail">${j} butir</div></div>`; }); }
+            document.getElementById('gift-summary').innerHTML=html;
+        }
+
+        // ==================== REPORTS & LAPORAN RENDERS ====================
+        function loadLaporan(){
+            let periode=document.getElementById('periode-laporan').value, now=new Date(), filter='';
+            if(periode==='minggu'){ let w=new Date(now.setDate(now.getDate()-7)); filter=w.toISOString().split('T')[0]; }
+            else if(periode==='bulan') filter=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            let pMasuk=dataPemasukan, pKeluar=dataPengeluaran, prod=dataProduksi;
+            if(periode==='minggu'){ pMasuk=dataPemasukan.filter(p=>p.tanggal>=filter); pKeluar=dataPengeluaran.filter(p=>p.tanggal>=filter); prod=dataProduksi.filter(p=>p.tanggal>=filter); }
+            else if(periode==='bulan'){ pMasuk=dataPemasukan.filter(p=>p.tanggal.startsWith(filter)); pKeluar=dataPengeluaran.filter(p=>p.tanggal.startsWith(filter)); prod=dataProduksi.filter(p=>p.tanggal.startsWith(filter)); }
+            let totalPemasukan=pMasuk.reduce((s,p)=>s+(p.tipe==='jual'?p.total:(p.tipe==='kas'?p.nominal:0)),0);
+            let totalPengeluaran=pKeluar.reduce((s,p)=>s+p.nominal,0);
+            let kat={pakan:0,obat:0,perawatan:0, lainnya:0};
+            pKeluar.forEach(p=>{ if(kat[p.kategori]!==undefined) kat[p.kategori]+=p.nominal; });
+            let prodPerTgl=new Map();
+            prod.forEach(p=>{ if(!prodPerTgl.has(p.tanggal)) prodPerTgl.set(p.tanggal,{horn:0,elba:0}); let d=prodPerTgl.get(p.tanggal); d.horn+=p.hornTotal; d.elba+=p.elbaTotal; });
+            let totalHDP=0;
+            for(let val of prodPerTgl.values()){ let totalAyam=populasi.horn+populasi.elba; totalHDP+=totalAyam>0?((val.horn+val.elba)/totalAyam*100):0; }
+            let avgHDP=prodPerTgl.size>0?(totalHDP/prodPerTgl.size).toFixed(1):0;
+            let th=0,thd=0,te=0,ted=0;
+            prod.forEach(p=>{ th+=p.hornTotal; thd+=p.hornTidak; te+=p.elbaTotal; ted+=p.elbaTidak; });
+            let persenTdkLayak=((thd+ted)/(th+te)*100).toFixed(1);
+            let giftData=pMasuk.filter(p=>p.tipe==='gift');
+            let totalGift=giftData.reduce((s,g)=>s+g.jumlahButir,0);
+            document.getElementById('laporan-container').innerHTML=`
+                <div class="summary-list"><div class="summary-item"><span class="summary-label">💰 Total Pemasukan</span><span class="summary-value">${formatRupiah(totalPemasukan)}</span></div>
+                <div class="summary-item"><span class="summary-label">💸 Total Pengeluaran</span><span class="summary-value">${formatRupiah(totalPengeluaran)}</span></div>
+                <div class="summary-item"><span class="summary-label">📈 Laba/Rugi</span><span class="summary-value ${totalPemasukan-totalPengeluaran<0?'negative':''}">${formatRupiah(totalPemasukan-totalPengeluaran)}</span></div>
+                <div class="summary-item"><span class="summary-label">🥚 Rata-rata HDP</span><span class="summary-value">${avgHDP}%</span></div></div>
+                <div class="card-title" style="margin-top:16px;">🎁 Gift</div><div class="stats-grid"><div class="stat-card"><div class="stat-value">${totalGift}</div><div class="stat-label">Total Gift (butir)</div></div></div>
+                <div class="card-title" style="margin-top:16px;">📊 Pengeluaran per Kategori</div>
+                <div class="list-item"><strong>🍚 Pakan:</strong> ${formatRupiah(kat.pakan)}</div><div class="list-item"><strong>💊 Obat/Vaksin:</strong> ${formatRupiah(kat.obat)}</div>
+                <div class="list-item"><strong>🔨 Perawatan Kandang:</strong> ${formatRupiah(kat.perawatan)}</div><div class="list-item"><strong>📦 Lainnya:</strong> ${formatRupiah(kat.lainnya)}</div>
+                <div class="card-title" style="margin-top:16px;">📉 Tidak Layak Jual</div><div class="list-item">Persentase: <strong>${isNaN(persenTdkLayak)?0:persenTdkLayak}%</strong></div>`;
+        }
+
+        function loadProduktivitas(){
+            let periode=document.getElementById('periode-produktivitas').value, now=new Date(), filter='';
+            if(periode==='minggu'){ let w=new Date(now.setDate(now.getDate()-7)); filter=w.toISOString().split('T')[0]; }
+            else if(periode==='bulan') filter=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            let prod=dataProduksi;
+            if(periode==='minggu') prod=dataProduksi.filter(p=>p.tanggal>=filter);
+            else if(periode==='bulan') prod=dataProduksi.filter(p=>p.tanggal.startsWith(filter));
+            let perTgl=new Map();
+            prod.forEach(p=>{ if(!perTgl.has(p.tanggal)) perTgl.set(p.tanggal,{hornTotal:0, hornTidak:0, elbaTotal:0, elbaTidak:0}); let d=perTgl.get(p.tanggal); d.hornTotal+=p.hornTotal; d.hornTidak+=p.hornTidak; d.elbaTotal+=p.elbaTotal; d.elbaTidak+=p.elbaTidak; });
+            let totalHorn=0, hornTdk=0, totalElba=0, elbaTdk=0;
+            for(let d of perTgl.values()){ totalHorn+=d.hornTotal; hornTdk+=d.hornTidak; totalElba+=d.elbaTotal; elbaTdk+=d.elbaTidak; }
+            let persenHorn=totalHorn>0?(hornTdk/totalHorn*100).toFixed(1):0;
+            let persenElba=totalElba>0?(elbaTdk/totalElba*100).toFixed(1):0;
+            let totalHDP=0;
+            for(let d of perTgl.values()){ let totalAyam=populasi.horn+populasi.elba; let totalTelur=d.hornTotal+d.elbaTotal; totalHDP+=totalAyam>0?(totalTelur/totalAyam*100):0; }
+            let avgHDP=perTgl.size>0?(totalHDP/perTgl.size).toFixed(1):0;
+            let hdpHorn=0, hdpElba=0;
+            for(let d of perTgl.values()){ if(populasi.horn>0) hdpHorn+=d.hornTotal/populasi.horn*100; if(populasi.elba>0) hdpElba+=d.elbaTotal/populasi.elba*100; }
+            let avgHDPHorn=perTgl.size>0?(hdpHorn/perTgl.size).toFixed(1):0;
+            let avgHDPElba=perTgl.size>0?(hdpElba/perTgl.size).toFixed(1):0;
+            let dates=Array.from(perTgl.keys()).sort();
+            let last7=dates.slice(-7);
+            let chartHtml='<div style="margin:20px 0"><strong>📈 Tren HDP Harian (7 hari terakhir)</strong></div>';
+            last7.forEach(tgl=>{ let d=perTgl.get(tgl); let totalTelur=d.hornTotal+d.elbaTotal; let totalAyam=populasi.horn+populasi.elba; let hdp=totalAyam>0?(totalTelur/totalAyam*100):0; chartHtml+=`<div class="chart-bar"><div class="chart-label">${tgl.slice(5)}</div><div class="chart-bar-fill" style="width:${hdp}%; background:#2E7D32;"></div><div style="width:50px;text-align:right;">${hdp.toFixed(1)}%</div></div>`; });
+            document.getElementById('produktivitas-container').innerHTML=`
+                <div class="stats-grid-4">
+                    <div class="stat-card"><div class="stat-value">${totalHorn}</div><div class="stat-label">Total Horn (butir)</div></div>
+                    <div class="stat-card"><div class="stat-value">${totalElba}</div><div class="stat-label">Total Elba (butir)</div></div>
+                    <div class="stat-card"><div class="stat-value">${avgHDP}%</div><div class="stat-label">Rata-rata HDP</div></div>
+                    <div class="stat-card"><div class="stat-value">${perTgl.size}</div><div class="stat-label">Hari Terdata</div></div>
+                </div>
+                <div style="display:flex; gap:20px; flex-wrap:wrap; margin:20px 0;">
+                    <div style="flex:1; background:#f8f9fa; border-radius:16px; padding:16px; text-align:center;"><div style="font-size:28px; font-weight:800; color:#2E7D32;">${avgHDPHorn}%</div><div style="font-size:12px; color:#666;">HDP Horn</div></div>
+                    <div style="flex:1; background:#f8f9fa; border-radius:16px; padding:16px; text-align:center;"><div style="font-size:28px; font-weight:800; color:#FF9800;">${avgHDPElba}%</div><div style="font-size:12px; color:#666;">HDP Elba</div></div>
+                    <div style="flex:1; background:#f8f9fa; border-radius:16px; padding:16px; text-align:center;"><div style="font-size:28px; font-weight:800; color:${persenHorn<persenElba?'#2E7D32':'#f44336'};">${persenHorn}%</div><div style="font-size:12px; color:#666;">% Gagal Horn</div></div>
+                    <div style="flex:1; background:#f8f9fa; border-radius:16px; padding:16px; text-align:center;"><div style="font-size:28px; font-weight:800; color:${persenElba<persenHorn?'#2E7D32':'#f44336'};">${persenElba}%</div><div style="font-size:12px; color:#666;">% Gagal Elba</div></div>
+                </div>
+                ${chartHtml}`;
+        }
+
+        // ==================== EXPORTS ====================
+        function formatRupiahExport(angka){ return angka?new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0}).format(angka):'Rp 0'; }
+        function exportToExcel(data,filename,headers){
+            let html=`<html><head><meta charset="UTF-8"><title>${filename}</title></head><body><table border="1"><thead>`;
+            headers.forEach(h=>html+=`<th style="background:#2E7D32;color:white;">${h}</th>`);
+            html+=`</thead><tbody>`;
+            data.forEach(row=>{ html+='<tr>'; headers.forEach(h=>{ let v=row[h]!==undefined?row[h]:''; html+=`<td>${v}</td>`; }); html+='</tr>'; });
+            html+=`</tbody></table></body></html>`;
+            let blob=new Blob([html],{type:'application/vnd.ms-excel'});
+            let link=document.createElement('a');
+            link.href=URL.createObjectURL(blob);
+            link.download=`${filename}_${new Date().toISOString().slice(0,10)}.xls`;
+            link.click(); URL.revokeObjectURL(link.href);
+        }
+        function exportProduksi(){ if(dataProduksi.length===0){alert('Tidak ada data!');return;} let data=dataProduksi.map(p=>({Tanggal:p.tanggal,Jam:p.jam,'Horn Total':p.hornTotal,'Horn Tidak':p.hornTidak,'Horn Layak':p.hornLayak,'Elba Total':p.elbaTotal,'Elba Tidak':p.elbaTidak,'Elba Layak':p.elbaLayak,Catatan:p.catatan||''})); exportToExcel(data,'4RFarm_Produksi',['Tanggal','Jam','Horn Total','Horn Tidak','Horn Layak','Elba Total','Elba Tidak','Elba Layak','Catatan']); }
+        function exportPemasukan(){ if(dataPemasukan.length===0){alert('Tidak ada data!');return;} let data=dataPemasukan.map(p=>{ if(p.tipe==='jual') return {Tanggal:p.tanggal,Tipe:'PENJUALAN',Jenis:p.jenis==='horn'?'Horn':'Elba','Jumlah Butir':p.jumlahButir,Harga:formatRupiahExport(p.harga),Total:formatRupiahExport(p.total),Pembeli:p.pembeli}; if(p.tipe==='gift') return {Tanggal:p.tanggal,Tipe:'GIFT',Jenis:p.jenis==='horn'?'Horn':'Elba','Jumlah Butir':p.jumlahButir,Harga:'Rp 0',Total:'Rp 0',Pembeli:p.penerima}; return {Tanggal:p.tanggal,Tipe:'KAS',Jenis:'-','Jumlah Butir':'-',Harga:'-',Total:formatRupiahExport(p.nominal),Pembeli:p.pembeli}; }); exportToExcel(data,'4RFarm_Pemasukan',['Tanggal','Tipe','Jenis','Jumlah Butir','Harga','Total','Pembeli']); }
+        function exportPengeluaran(){ if(dataPengeluaran.length===0){alert('Tidak ada data!');return;} let kat={pakan:'Pakan',obat:'Obat',perawatan:'Perawatan',lainnya:'Lainnya'}; let data=dataPengeluaran.map(p=>({Tanggal:p.tanggal,Kategori:kat[p.kategori]||p.kategori,Nominal:formatRupiahExport(p.nominal),Keterangan:p.keterangan||''})); exportToExcel(data,'4RFarm_Pengeluaran',['Tanggal','Kategori','Nominal','Keterangan']); }
+        function exportSemua(){
+            if(dataProduksi.length===0&&dataPemasukan.length===0&&dataPengeluaran.length===0){alert('Tidak ada data!');return;}
+            let html=`<html><body><h2>PRODUKSI</h2><table border="1"><thead><tr><th>Tanggal</th><th>Jam</th><th>Horn Total</th><th>Horn Tidak</th><th>Horn Layak</th><th>Elba Total</th><th>Elba Tidak</th><th>Elba Layak</th><th>Catatan</th></tr></thead><tbody>`;
+            dataProduksi.forEach(p=>{ html+=`<tr><td>${p.tanggal}</td><td>${p.jam}</td><td>${p.hornTotal}</td><td>${p.hornTidak}</td><td>${p.hornLayak}</td><td>${p.elbaTotal}</td><td>${p.elbaTidak}</td><td>${p.elbaLayak}</td><td>${p.catatan||''}</td></tr>`; });
+            html+=`</tbody></table><br><h2>PEMASUKAN</h2><table border="1"><thead><tr><th>Tanggal</th><th>Tipe</th><th>Detail</th><th>Total</th></tr></thead><tbody>`;
+            dataPemasukan.forEach(p=>{ if(p.tipe==='jual') html+=`<tr><td>${p.tanggal}</td><td>PENJUALAN</td><td>${p.jenis} ${p.jumlahButir} butir x ${formatRupiahExport(p.harga)}</td><td>${formatRupiahExport(p.total)}</td></tr>`; else if(p.tipe==='gift') html+=`<tr><td>${p.tanggal}</td><td>GIFT</td><td>${p.jenis} ${p.jumlahButir} butir ke ${p.penerima}</td><td>Rp 0</td></tr>`; else html+=`<tr><td>${p.tanggal}</td><td>KAS</td><td>${p.pembeli}</td><td>${formatRupiahExport(p.nominal)}</td></tr>`; });
+            html+=`</tbody></table><br><h2>PENGELUARAN</h2><table border="1"><thead><tr><th>Tanggal</th><th>Kategori</th><th>Nominal</th><th>Keterangan</th></tr></thead><tbody>`;
+            dataPengeluaran.forEach(p=>{ html+=`<tr><td>${p.tanggal}</td><td>${p.kategori}</td><td>${formatRupiahExport(p.nominal)}</td><td>${p.keterangan||''}</td></tr>`; });
+            html+=`</tbody></table></body></html>`;
+            let blob=new Blob([html],{type:'application/vnd.ms-excel'});
+            let link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`4RFarm_All_${new Date().toISOString().slice(0,10)}.xls`; link.click();
+        }
+        function exportLaporanKeuangan(){
+            let bulanMap=new Map();
+            dataPemasukan.forEach(p=>{ let b=p.tanggal.slice(0,7); if(!bulanMap.has(b)) bulanMap.set(b,{p:0,k:0}); bulanMap.get(b).p+=(p.tipe==='jual'?p.total:(p.tipe==='kas'?p.nominal:0)); });
+            dataPengeluaran.forEach(p=>{ let b=p.tanggal.slice(0,7); if(!bulanMap.has(b)) bulanMap.set(b,{p:0,k:0}); bulanMap.get(b).k+=p.nominal; });
+            let data=Array.from(bulanMap.entries()).map(([b,v])=>({Bulan:b,Pemasukan:formatRupiahExport(v.p),Pengeluaran:formatRupiahExport(v.k),Laba:formatRupiahExport(v.p-v.k)})).sort((a,b)=>a.Bulan.localeCompare(b.Bulan));
+            exportToExcel(data,'4RFarm_LaporanKeuangan',['Bulan','Pemasukan','Pengeluaran','Laba']);
+        }
+        function exportLaporanPembeli(){
+            let map=new Map();
+            dataPemasukan.forEach(p=>{ if(p.tipe==='jual'&&p.pembeli) map.set(p.pembeli,(map.get(p.pembeli)||0)+p.total); });
+            let data=Array.from(map.entries()).map(([n,t])=>({Pembeli:n,Total:formatRupiahExport(t)})).sort((a,b)=>parseInt(b.Total.replace(/[^0-9]/g,''))-parseInt(a.Total.replace(/[^0-9]/g,'')));
+            exportToExcel(data,'4RFarm_LaporanPembeli',['Pembeli','Total']);
+        }
+        function exportBackupJSON(){
+            let backup={version:APP_VERSION,exportDate:new Date().toISOString(),produksi:dataProduksi,pemasukan:dataPemasukan,pengeluaran:dataPengeluaran,populasi:populasi,harga:harga,stokAwal:stokAwal,po:dataPO};
+            let blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+            let link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`4RFarm_Backup_${Date.now()}.json`; link.click();
+        }
+
+        // ==================== IMPORTS ====================
+        document.getElementById('file-import').addEventListener('change', function(e){
+            let file=e.target.files[0]; if(!file) return;
+            let reader=new FileReader();
+            reader.onload=function(ev){
+                try{
+                    let data=JSON.parse(ev.target.result);
+                    if(!data.produksi||!data.pemasukan||!data.pengeluaran){ alert('Format tidak valid!'); return; }
+                    fileDataImport=data;
+                    document.getElementById('preview-content').innerHTML=`<div class="list-item">📦 Produksi: ${data.produksi.length} entry<br>💰 Pemasukan: ${data.pemasukan.length}<br>💸 Pengeluaran: ${data.pengeluaran.length}<br>📌 Versi: ${data.version||'1.0'}</div>`;
+                    document.getElementById('import-preview').classList.remove('hidden');
+                }catch(err){ alert('Error: '+err.message); }
+            }; reader.readAsText(file);
+        });
+        function prosesImport(){
+            if(!fileDataImport){ alert('Pilih file!'); return; }
+            let mode=document.querySelector('input[name="import-mode"]:checked').value;
+            if(mode==='ganti'){
+                if(!confirm('Ganti semua data yang ada?')) return;
+                dataProduksi=fileDataImport.produksi||[]; dataPemasukan=fileDataImport.pemasukan||[]; dataPengeluaran=fileDataImport.pengeluaran||[]; dataPO=fileDataImport.po||[];
+                if(fileDataImport.populasi) populasi=fileDataImport.populasi; if(fileDataImport.harga) harga=fileDataImport.harga; if(fileDataImport.stokAwal) stokAwal=fileDataImport.stokAwal;
+            }else{
+                let newProd=0, newPem=0, newPeng=0, newPO=0;
+                let existingProdIds=new Set(dataProduksi.map(p=>p.id));
+                for(let item of (fileDataImport.produksi||[])){ if(!existingProdIds.has(item.id)){ dataProduksi.push(item); newProd++; } }
+                let existingPemIds=new Set(dataPemasukan.map(p=>p.id));
+                for(let item of (fileDataImport.pemasukan||[])){ if(!existingPemIds.has(item.id)){ dataPemasukan.push(item); newPem++; } }
+                let existingPengIds=new Set(dataPengeluaran.map(p=>p.id));
+                for(let item of (fileDataImport.pengeluaran||[])){ if(!existingPengIds.has(item.id)){ dataPengeluaran.push(item); newPeng++; } }
+                let existingPOIds=new Set(dataPO.map(p=>p.id));
+                for(let item of (fileDataImport.po||[])){ if(!existingPOIds.has(item.id)){ dataPO.push(item); newPO++; } }
+                alert(`Import berhasil: +${newProd} produksi, +${newPem} transaksi, +${newPeng} pengeluaran, +${newPO} PO`);
+            }
+            queueSync(); document.getElementById('file-import').value=''; document.getElementById('import-preview').classList.add('hidden'); fileDataImport=null;
+            updatePengaturanForm(); updateHargaDisplay(); updateDashboard(); updateExportStats(); updateRiwayatProduksi(); updateRiwayatPemasukan(); updatePelangganList(); updatePOList(); updateRiwayatPengeluaran();
+        }
+
+        function hapusSemuaData(){
+            if(confirm('Hapus SEMUA data?')){ if(prompt('Ketik "HAPUS" untuk konfirmasi')==='HAPUS'){ dataProduksi=[]; dataPemasukan=[]; dataPengeluaran=[]; dataPO=[]; stokAwal={horn:0,elba:0}; queueSync(); updateDashboard(); updateExportStats(); updateRiwayatProduksi(); updateRiwayatPemasukan(); updatePelangganList(); updatePOList(); updateRiwayatPengeluaran(); alert('Semua data dihapus!'); } }
+        }
+
+        // ==================== TABS SYSTEM UTUT ====================
+        function showTab(tabName, element){
+            document.querySelectorAll('.tab-content').forEach(tab=>tab.classList.add('hidden'));
+            let targetContent = document.getElementById(`tab-${tabName}`);
+            if(targetContent) targetContent.classList.remove('hidden');
+            
+            document.querySelectorAll('.tab').forEach(tab=>tab.classList.remove('active'));
+            if(element) {
+                element.classList.add('active');
+            } else {
+                document.querySelectorAll('.tab').forEach(t => {
+                    if(t.textContent.toLowerCase().includes(tabName.toLowerCase())) t.classList.add('active');
+                });
+            }
+            
+            if(tabName==='laporan') loadLaporan();
+            if(tabName==='produktivitas') loadProduktivitas();
+            if(tabName==='export') updateExportStats();
+            if(tabName==='produksi') updateRiwayatProduksi();
+            if(tabName==='po') updatePOList();
+            if(tabName==='pelanggan') updatePelangganList();
+            if(tabName==='pemasukan'){ 
+                let inputPenjualan = document.querySelector('input[value="jual"]');
+                if(inputPenjualan) inputPenjualan.checked=true; 
+                toggleTransaksiJenis(); setSatuan('butir'); setJualJenis('horn'); setGiftJenis('horn'); updateRiwayatPemasukan(); 
+            }
+            if(tabName==='pengeluaran') updateRiwayatPengeluaran();
+            if(tabName==='dashboard') updateStokDisplay();
+        }
+
+        document.getElementById('horn-total').addEventListener('input', hitungLayak);
+        document.getElementById('horn-tidak-layak').addEventListener('input', hitungLayak);
+        document.getElementById('elba-total').addEventListener('input', hitungLayak);
+        document.getElementById('elba-tidak-layak').addEventListener('input', hitungLayak);
+        
+        let today=new Date().toISOString().split('T')[0];
+        document.getElementById('produksi-tanggal').value=today;
+        document.getElementById('pemasukan-tanggal').value=today;
+        document.getElementById('pengeluaran-tanggal').value=today;
+        
+        hitungLayak();
+        loadAllData();
+        toggleTransaksiJenis();
+    </script>
+</body>
+</html>
